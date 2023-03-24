@@ -1,1 +1,1 @@
-# HierarchyTreeWPF
+# Hierarchy Tree WPF
