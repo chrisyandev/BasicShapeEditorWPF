@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
 
-namespace HierarchyTreeWPF.Models
+namespace HierarchyTreeAndCanvasWPF.Models
 {
     public class CanvasItem
     {

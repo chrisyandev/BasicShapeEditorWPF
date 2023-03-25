@@ -1,8 +1,8 @@
-﻿<Application x:Class="HierarchyTreeWPF.App"
+﻿<Application x:Class="HierarchyTreeAndCanvasWPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:HierarchyTreeWPF"
-             xmlns:converters="clr-namespace:HierarchyTreeWPF.Converters"
+             xmlns:local="clr-namespace:HierarchyTreeAndCanvasWPF"
+             xmlns:converters="clr-namespace:HierarchyTreeAndCanvasWPF.Converters"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <converters:ButtonColorConverter x:Key="ButtonColorConverter"/>

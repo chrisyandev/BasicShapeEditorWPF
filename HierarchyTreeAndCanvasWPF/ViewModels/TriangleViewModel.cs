@@ -1,4 +1,4 @@
-﻿using HierarchyTreeWPF.Models;
+﻿using HierarchyTreeAndCanvasWPF.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +9,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace HierarchyTreeWPF.ViewModels
+namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
     public class TriangleViewModel : ShapeViewModelBase
     {

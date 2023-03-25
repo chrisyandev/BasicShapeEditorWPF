@@ -14,11 +14,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using HierarchyTreeWPF.Extensions;
-using HierarchyTreeWPF.Models;
-using HierarchyTreeWPF.ViewModels;
+using HierarchyTreeAndCanvasWPF.Extensions;
+using HierarchyTreeAndCanvasWPF.Models;
+using HierarchyTreeAndCanvasWPF.ViewModels;
 
-namespace HierarchyTreeWPF.Views
+namespace HierarchyTreeAndCanvasWPF.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

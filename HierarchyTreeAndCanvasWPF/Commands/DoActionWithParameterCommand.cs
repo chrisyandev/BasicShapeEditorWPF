@@ -1,4 +1,4 @@
-﻿using HierarchyTreeWPF.ViewModels;
+﻿using HierarchyTreeAndCanvasWPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace HierarchyTreeWPF.Commands
+namespace HierarchyTreeAndCanvasWPF.Commands
 {
     public class DoActionWithParameterCommand : CommandBase
     {

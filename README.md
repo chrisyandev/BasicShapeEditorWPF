@@ -1,1 +1,1 @@
-# Hierarchy Tree WPF
+# Hierarchy Tree and Canvas WPF

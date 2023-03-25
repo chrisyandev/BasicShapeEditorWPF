@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace HierarchyTreeWPF.Extensions
+namespace HierarchyTreeAndCanvasWPF.Extensions
 {
     // Just some practice using extension methods
     public static class Extensions

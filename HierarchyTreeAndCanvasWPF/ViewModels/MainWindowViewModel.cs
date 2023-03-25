@@ -1,4 +1,4 @@
-﻿using HierarchyTreeWPF.Models;
+﻿using HierarchyTreeAndCanvasWPF.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
-using HierarchyTreeWPF.Commands;
+using HierarchyTreeAndCanvasWPF.Commands;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
-namespace HierarchyTreeWPF.ViewModels
+namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {

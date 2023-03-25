@@ -1,64 +1,62 @@
-﻿using HierarchyTreeWPF.Models;
+﻿using HierarchyTreeAndCanvasWPF.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace HierarchyTreeWPF.ViewModels
+namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
-    public class RectangleViewModel : ShapeViewModelBase
+    public class EllipseViewModel : ShapeViewModelBase
     {
         private CanvasItem _canvasItem;
-        private Rectangle _rectangle;
+        private Ellipse _ellipse;
 
-        public RectangleViewModel(CanvasItem canvasItem)
+        public EllipseViewModel(CanvasItem canvasItem)
         {
             _canvasItem = canvasItem;
-            _rectangle = canvasItem.Shape as Rectangle;
+            _ellipse = _canvasItem.Shape as Ellipse;
         }
 
         public double Width
         {
-            get { return _rectangle.Width; }
+            get { return _ellipse.Width; }
             set
             {
-                if (value == _rectangle.Width) { return; }
-                _rectangle.Width = value;
+                if (value == _ellipse.Width) { return; }
+                _ellipse.Width = value;
                 OnPropertyChanged();
 
-                Debug.WriteLine(_rectangle.Width);
+                Debug.WriteLine(_ellipse.Width);
             }
         }
 
         public double Height
         {
-            get { return _rectangle.Height; }
+            get { return _ellipse.Height; }
             set
             {
-                if (value == _rectangle.Height) { return; }
-                _rectangle.Height = value;
+                if (value == _ellipse.Height) { return; }
+                _ellipse.Height = value;
                 OnPropertyChanged();
 
-                Debug.WriteLine(_rectangle.Height);
+                Debug.WriteLine(_ellipse.Height);
             }
         }
 
         public Brush Fill
         {
-            get { return _rectangle.Fill; }
+            get { return _ellipse.Fill; }
             set
             {
-                if (value == _rectangle.Fill) { return; }
-                _rectangle.Fill = value;
+                if (value == _ellipse.Fill) { return; }
+                _ellipse.Fill = value;
                 OnPropertyChanged();
 
-                Debug.WriteLine(_rectangle.Fill);
+                Debug.WriteLine(_ellipse.Fill);
             }
         }
 
@@ -87,6 +85,5 @@ namespace HierarchyTreeWPF.ViewModels
                 Debug.WriteLine(_canvasItem.Y);
             }
         }
-
     }
 }

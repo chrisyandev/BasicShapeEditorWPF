@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace HierarchyTreeWPF
+namespace HierarchyTreeAndCanvasWPF
 {
     /// <summary>
     /// Interaction logic for App.xaml

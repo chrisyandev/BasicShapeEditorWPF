@@ -9,7 +9,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace HierarchyTreeWPF.Converters
+namespace HierarchyTreeAndCanvasWPF.Converters
 {
     internal class ButtonColorConverter : IValueConverter
     {
