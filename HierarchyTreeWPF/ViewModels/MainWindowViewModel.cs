@@ -13,6 +13,7 @@ using HierarchyTreeWPF.Commands;
 using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace HierarchyTreeWPF.ViewModels
 {
@@ -78,8 +79,8 @@ namespace HierarchyTreeWPF.ViewModels
                 {
                     Id = 1,
                     Shape = newRectangle,
-                    X = Mouse.GetPosition(canvas).X,
-                    Y = Mouse.GetPosition(canvas).Y
+                    X = Mouse.GetPosition(canvas).X - (newRectangle.Width / 2),
+                    Y = Mouse.GetPosition(canvas).Y - (newRectangle.Height / 2)
                 };
 
                 CanvasItems.Add(new RectangleViewModel(newCanvasItem));
@@ -97,11 +98,37 @@ namespace HierarchyTreeWPF.ViewModels
                 {
                     Id = 1,
                     Shape = newEllipse,
-                    X = Mouse.GetPosition(canvas).X,
-                    Y = Mouse.GetPosition(canvas).Y
+                    X = Mouse.GetPosition(canvas).X - (newEllipse.Width / 2),
+                    Y = Mouse.GetPosition(canvas).Y - (newEllipse.Height / 2)
                 };
 
                 CanvasItems.Add(new EllipseViewModel(newCanvasItem));
+            }
+            else if (ShapeToAdd == "triangle")
+            {
+                Polygon newTriangle = new Polygon
+                {
+                    Fill = Brushes.Green,
+                    Points = new PointCollection
+                    {
+                        new Point(0, 50),
+                        new Point(25, 0),
+                        new Point(50, 50)
+                    }
+                };
+
+                double centroidX = (newTriangle.Points[0].X + newTriangle.Points[1].X + newTriangle.Points[2].X) / 3;
+                double centroidY = (newTriangle.Points[0].Y + newTriangle.Points[1].Y + newTriangle.Points[2].Y) / 3;
+
+                CanvasItem newCanvasItem = new CanvasItem
+                {
+                    Id = 1,
+                    Shape = newTriangle,
+                    X = Mouse.GetPosition(canvas).X - centroidX,
+                    Y = Mouse.GetPosition(canvas).Y - centroidY
+                };
+
+                CanvasItems.Add(new TriangleViewModel(newCanvasItem));
             }
         }
     }

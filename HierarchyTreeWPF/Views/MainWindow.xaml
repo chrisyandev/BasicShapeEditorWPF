@@ -32,6 +32,9 @@
                 <DataTemplate DataType="{x:Type vm:EllipseViewModel}">
                     <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
                 </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:TriangleViewModel}">
+                    <Polygon Points="{Binding Points}" Fill="{Binding Fill}"/>
+                </DataTemplate>
             </ItemsControl.Resources>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -53,6 +56,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
                     Content="Rectangle"
@@ -68,6 +72,13 @@
                                          ConverterParameter=ellipse}"
                     Command="{Binding SetShapeToAddCommand}"
                     CommandParameter="ellipse"/>
+            <Button Grid.Column="2"
+                    Content="Triangle"
+                    Background="{Binding ShapeToAdd,
+                                         Converter={StaticResource ButtonColorConverter},
+                                         ConverterParameter=triangle}"
+                    Command="{Binding SetShapeToAddCommand}"
+                    CommandParameter="triangle"/>
         </Grid>
 
     </Grid>
