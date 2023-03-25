@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -35,25 +36,7 @@ namespace HierarchyTreeWPF.Views
 
             Canvas canvas = sender as Canvas;
 
-            Rectangle newRectangle = new Rectangle
-            {
-                Width = 50,
-                Height = 50,
-                Fill = Brushes.Red
-            };
-
-            CanvasItem newCanvasItem = new CanvasItem
-            {
-                Id = 1,
-                Shape = newRectangle,
-                X = Mouse.GetPosition(canvas).X,
-                Y = Mouse.GetPosition(canvas).Y
-            };
-
-            RectangleViewModel newRectangleViewModel = new(newCanvasItem);
-
-            (DataContext as MainWindowViewModel).CanvasItems.Add(newRectangleViewModel);
-
+            (DataContext as MainWindowViewModel).AddShape(canvas);
         }
     }
 }

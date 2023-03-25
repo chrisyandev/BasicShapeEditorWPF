@@ -25,6 +25,14 @@
 
         <ItemsControl Grid.Column="1"
                       ItemsSource="{Binding CanvasItems}">
+            <ItemsControl.Resources>
+                <DataTemplate DataType="{x:Type vm:RectangleViewModel}">
+                    <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:EllipseViewModel}">
+                    <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
+                </DataTemplate>
+            </ItemsControl.Resources>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas Background="Orange" MouseLeftButtonDown="CanvasLeftClicked"/>
@@ -36,12 +44,31 @@
                     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
                 </Style>
             </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
         </ItemsControl>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    Content="Rectangle"
+                    Background="{Binding ShapeToAdd,
+                                         Converter={StaticResource ButtonColorConverter},
+                                         ConverterParameter=rectangle}"
+                    Command="{Binding SetShapeToAddCommand}"
+                    CommandParameter="rectangle"/>
+            <Button Grid.Column="1"
+                    Content="Ellipse"
+                    Background="{Binding ShapeToAdd,
+                                         Converter={StaticResource ButtonColorConverter},
+                                         ConverterParameter=ellipse}"
+                    Command="{Binding SetShapeToAddCommand}"
+                    CommandParameter="ellipse"/>
+        </Grid>
 
     </Grid>
 </Window>
