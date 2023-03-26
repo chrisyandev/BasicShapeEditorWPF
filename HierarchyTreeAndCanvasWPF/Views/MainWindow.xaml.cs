@@ -63,8 +63,20 @@ namespace HierarchyTreeAndCanvasWPF.Views
             {
                 Point cursorPos = e.GetPosition(canvas);
 
-                Canvas.SetLeft(shape, cursorPos.X - cursorToLeftDistance);
-                Canvas.SetTop(shape, cursorPos.Y - cursorToTopDistance);
+                double newLeft = cursorPos.X - cursorToLeftDistance;
+                double newTop = cursorPos.Y - cursorToTopDistance;
+
+                if (newLeft + shape.ActualWidth > canvas.ActualWidth)
+                {
+                    newLeft = canvas.ActualWidth - shape.ActualWidth;
+                }
+                if (newTop + shape.ActualHeight > canvas.ActualHeight)
+                {
+                    newTop = canvas.ActualHeight - shape.ActualHeight;
+                }
+
+                Canvas.SetLeft(shape, newLeft < 0 ? 0 : newLeft);
+                Canvas.SetTop(shape, newTop < 0 ? 0 : newTop);
             }
         }
 
