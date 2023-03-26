@@ -14,7 +14,6 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using HierarchyTreeAndCanvasWPF.ViewModels.Shapes;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
@@ -33,8 +32,6 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             };
             TreeItems[1].Items.Add(new TreeItem(2, "Circle"));
 
-            CanvasItems = new ObservableCollection<ShapeViewModelBase>();
-
             SetShapeToAddCommand = new DoActionWithParameterCommand(shapeName =>
             {
                 ShapeToAdd = shapeName as string;
@@ -44,8 +41,6 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
         }
 
         public ObservableCollection<TreeItem> TreeItems { get; set; }
-
-        public ObservableCollection<ShapeViewModelBase> CanvasItems { get; set; }
 
         public ObservableCollection<Shape> CanvasShapes { get; set; }
 
@@ -88,8 +83,6 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                     Y = Mouse.GetPosition(canvas).Y - (newRectangle.Height / 2)
                 };
 
-                CanvasItems.Add(new RectangleViewModel(newCanvasItem));
-
                 Canvas.SetLeft(newRectangle, newCanvasItem.X);
                 Canvas.SetTop(newRectangle, newCanvasItem.Y);
                 CanvasShapes.Add(newRectangle);
@@ -111,8 +104,6 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                     X = Mouse.GetPosition(canvas).X - (newEllipse.Width / 2),
                     Y = Mouse.GetPosition(canvas).Y - (newEllipse.Height / 2)
                 };
-
-                CanvasItems.Add(new EllipseViewModel(newCanvasItem));
 
                 Canvas.SetLeft(newEllipse, newCanvasItem.X);
                 Canvas.SetTop(newEllipse, newCanvasItem.Y);
@@ -142,8 +133,6 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                     X = Mouse.GetPosition(canvas).X - centroidX,
                     Y = Mouse.GetPosition(canvas).Y - centroidY
                 };
-
-                CanvasItems.Add(new TriangleViewModel(newCanvasItem));
 
                 Canvas.SetLeft(newTriangle, newCanvasItem.X);
                 Canvas.SetTop(newTriangle, newCanvasItem.Y);
