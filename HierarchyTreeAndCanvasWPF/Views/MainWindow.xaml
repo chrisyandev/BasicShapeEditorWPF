@@ -59,27 +59,59 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <Style x:Key="DefaultButtonStyle" TargetType="Button">
+                    <Setter Property="Background" Value="Beige"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Style>
+                <SolidColorBrush x:Key="ActiveButtonBackgroundBrush" Color="Purple"/>
+                <SolidColorBrush x:Key="ActiveButtonForegroundBrush" Color="White"/>
+            </Grid.Resources>
             <Button Grid.Column="0"
                     Content="Rectangle"
-                    Background="{Binding ShapeToAdd,
-                                         Converter={StaticResource ActiveButtonConverter},
-                                         ConverterParameter=rectangle}"
                     Command="{Binding SetShapeToAddCommand}"
-                    CommandParameter="rectangle"/>
+                    CommandParameter="rectangle">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShapeToAdd}" Value="rectangle">
+                                <Setter Property="Background" Value="{StaticResource ActiveButtonBackgroundBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource ActiveButtonForegroundBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button Grid.Column="1"
                     Content="Ellipse"
-                    Background="{Binding ShapeToAdd,
-                                         Converter={StaticResource ActiveButtonConverter},
-                                         ConverterParameter=ellipse}"
                     Command="{Binding SetShapeToAddCommand}"
-                    CommandParameter="ellipse"/>
+                    CommandParameter="ellipse">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShapeToAdd}" Value="ellipse">
+                                <Setter Property="Background" Value="{StaticResource ActiveButtonBackgroundBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource ActiveButtonForegroundBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
             <Button Grid.Column="2"
                     Content="Triangle"
-                    Background="{Binding ShapeToAdd,
-                                         Converter={StaticResource ActiveButtonConverter},
-                                         ConverterParameter=triangle}"
                     Command="{Binding SetShapeToAddCommand}"
-                    CommandParameter="triangle"/>
+                    CommandParameter="triangle">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShapeToAdd}" Value="triangle">
+                                <Setter Property="Background" Value="{StaticResource ActiveButtonBackgroundBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource ActiveButtonForegroundBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </Grid>
 
     </Grid>
