@@ -25,29 +25,14 @@
                   Background="LightYellow"/>
 
         <ItemsControl Grid.Column="1"
-                      ItemsSource="{Binding CanvasItems}">
-            <ItemsControl.Resources>
-                <DataTemplate DataType="{x:Type shapes:RectangleViewModel}">
-                    <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type shapes:EllipseViewModel}">
-                    <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type shapes:TriangleViewModel}">
-                    <Polygon Points="{Binding Points}" Fill="{Binding Fill}"/>
-                </DataTemplate>
-            </ItemsControl.Resources>
+                      ItemsSource="{Binding CanvasShapes}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Background="Orange" MouseLeftButtonDown="CanvasLeftClicked"/>
+                    <Canvas Background="Orange"
+                            MouseLeftButtonDown="CanvasLeftClicked"
+                            AllowDrop="True"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemContainerStyle>
-                <Style TargetType="ContentPresenter">
-                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
-                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
-                </Style>
-            </ItemsControl.ItemContainerStyle>
         </ItemsControl>
 
         <Grid Grid.Column="1">

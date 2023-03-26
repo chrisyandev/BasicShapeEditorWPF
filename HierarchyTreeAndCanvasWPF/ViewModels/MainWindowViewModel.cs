@@ -39,11 +39,15 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             {
                 ShapeToAdd = shapeName as string;
             });
+
+            CanvasShapes = new ObservableCollection<Shape>();
         }
 
         public ObservableCollection<TreeItem> TreeItems { get; set; }
 
         public ObservableCollection<ShapeViewModelBase> CanvasItems { get; set; }
+
+        public ObservableCollection<Shape> CanvasShapes { get; set; }
 
         public string ShapeToAdd
         {
@@ -85,6 +89,11 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 };
 
                 CanvasItems.Add(new RectangleViewModel(newCanvasItem));
+
+                Canvas.SetLeft(newRectangle, newCanvasItem.X);
+                Canvas.SetTop(newRectangle, newCanvasItem.Y);
+                CanvasShapes.Add(newRectangle);
+                SetupDragAndDrop(newRectangle);
             }
             else if (ShapeToAdd == "ellipse")
             {
@@ -104,6 +113,11 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 };
 
                 CanvasItems.Add(new EllipseViewModel(newCanvasItem));
+
+                Canvas.SetLeft(newEllipse, newCanvasItem.X);
+                Canvas.SetTop(newEllipse, newCanvasItem.Y);
+                CanvasShapes.Add(newEllipse);
+                SetupDragAndDrop(newEllipse);
             }
             else if (ShapeToAdd == "triangle")
             {
@@ -130,7 +144,22 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 };
 
                 CanvasItems.Add(new TriangleViewModel(newCanvasItem));
+
+                Canvas.SetLeft(newTriangle, newCanvasItem.X);
+                Canvas.SetTop(newTriangle, newCanvasItem.Y);
+                CanvasShapes.Add(newTriangle);
+                SetupDragAndDrop(newTriangle);
             }
+        }
+
+        private void SetupDragAndDrop(Shape shape)
+        {
+            shape.MouseEnter += (s, e) => { Debug.WriteLine("enter"); };
+            shape.MouseRightButtonDown += (s, e) =>
+            {
+                Debug.WriteLine("drag start");
+                DragDrop.DoDragDrop(shape, shape, DragDropEffects.Move);
+            };
         }
     }
 }
