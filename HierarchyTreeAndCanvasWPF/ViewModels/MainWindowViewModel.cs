@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using HierarchyTreeAndCanvasWPF.Utilities;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
@@ -66,62 +67,51 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
 
         public void AddShape(Canvas canvas)
         {
+            double mousePosX = Mouse.GetPosition(canvas).X;
+            double mousePosY = Mouse.GetPosition(canvas).Y;
+
             if (ShapeToAdd == "rectangle")
             {
-                Rectangle newRectangle = new Rectangle
-                {
-                    Width = 50,
-                    Height = 50,
-                    Fill = Brushes.Red
-                };
+                Rectangle newRectangle = ShapeFactory.CreateShape(
+                    ShapeType.Rectangle, 100, 100, Brushes.Blue) as Rectangle;
 
-                CanvasItem newCanvasItem = new CanvasItem
+                CanvasItem newCanvasItem = new()
                 {
                     Id = 1,
                     Shape = newRectangle,
-                    X = Mouse.GetPosition(canvas).X - (newRectangle.Width / 2),
-                    Y = Mouse.GetPosition(canvas).Y - (newRectangle.Height / 2)
+                    X = mousePosX - (newRectangle.Width / 2),
+                    Y = mousePosY - (newRectangle.Height / 2)
                 };
 
                 Canvas.SetLeft(newRectangle, newCanvasItem.X);
                 Canvas.SetTop(newRectangle, newCanvasItem.Y);
+
                 CanvasShapes.Add(newRectangle);
                 SetupDragAndDrop(newRectangle);
             }
             else if (ShapeToAdd == "ellipse")
             {
-                Ellipse newEllipse = new Ellipse
-                {
-                    Width = 50,
-                    Height = 50,
-                    Fill = Brushes.Blue
-                };
+                Ellipse newEllipse = ShapeFactory.CreateShape(
+                    ShapeType.Ellipse, 100, 100, Brushes.Red) as Ellipse;
 
                 CanvasItem newCanvasItem = new CanvasItem
                 {
                     Id = 1,
                     Shape = newEllipse,
-                    X = Mouse.GetPosition(canvas).X - (newEllipse.Width / 2),
-                    Y = Mouse.GetPosition(canvas).Y - (newEllipse.Height / 2)
+                    X = mousePosX - (newEllipse.Width / 2),
+                    Y = mousePosY - (newEllipse.Height / 2)
                 };
 
                 Canvas.SetLeft(newEllipse, newCanvasItem.X);
                 Canvas.SetTop(newEllipse, newCanvasItem.Y);
+
                 CanvasShapes.Add(newEllipse);
                 SetupDragAndDrop(newEllipse);
             }
             else if (ShapeToAdd == "triangle")
             {
-                Polygon newTriangle = new Polygon
-                {
-                    Fill = Brushes.Green,
-                    Points = new PointCollection
-                    {
-                        new Point(0, 50),
-                        new Point(25, 0),
-                        new Point(50, 50)
-                    }
-                };
+                Polygon newTriangle = ShapeFactory.CreateShape(
+                    ShapeType.Triangle, 100, 100, Brushes.Green) as Polygon;
 
                 double centroidX = (newTriangle.Points[0].X + newTriangle.Points[1].X + newTriangle.Points[2].X) / 3;
                 double centroidY = (newTriangle.Points[0].Y + newTriangle.Points[1].Y + newTriangle.Points[2].Y) / 3;
@@ -130,18 +120,19 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 {
                     Id = 1,
                     Shape = newTriangle,
-                    X = Mouse.GetPosition(canvas).X - centroidX,
-                    Y = Mouse.GetPosition(canvas).Y - centroidY
+                    X = mousePosX - centroidX,
+                    Y = mousePosY - centroidY
                 };
 
                 Canvas.SetLeft(newTriangle, newCanvasItem.X);
                 Canvas.SetTop(newTriangle, newCanvasItem.Y);
+
                 CanvasShapes.Add(newTriangle);
                 SetupDragAndDrop(newTriangle);
             }
         }
 
-        private void SetupDragAndDrop(Shape shape)
+        private static void SetupDragAndDrop(Shape shape)
         {
             shape.MouseEnter += (s, e) => { Debug.WriteLine("enter"); };
             shape.MouseRightButtonDown += (s, e) =>
