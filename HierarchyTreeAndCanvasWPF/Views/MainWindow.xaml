@@ -27,9 +27,11 @@
                       ItemsSource="{Binding CanvasShapes}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Background="Orange"
-                            MouseLeftButtonDown="CanvasLeftClicked"
-                            AllowDrop="True"/>
+                    <Canvas Initialized="Canvas_Initialized"
+                            Background="Orange"
+                            AllowDrop="True"
+                            MouseRightButtonDown="Canvas_MouseRightButtonDown"
+                            DragOver="Canvas_DragOver"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>

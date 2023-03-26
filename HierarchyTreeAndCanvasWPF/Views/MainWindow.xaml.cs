@@ -25,18 +25,66 @@ namespace HierarchyTreeAndCanvasWPF.Views
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static Canvas _mainCanvas;
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void CanvasLeftClicked(object sender, MouseButtonEventArgs e)
+        private void Canvas_Initialized(object sender, EventArgs e)
         {
-            Debug.WriteLine("canvas clicked");
+            _mainCanvas = sender as Canvas;
+        }
+
+        private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("canvas right clicked");
 
             Canvas canvas = sender as Canvas;
 
-            (DataContext as MainWindowViewModel).AddShape(canvas);
+            Shape shape = (DataContext as MainWindowViewModel).AddShape(canvas);
+
+            if (shape != null)
+            {
+                SetupDragAndDrop(shape);
+            }
+        }
+
+        private void Canvas_DragOver(object sender, DragEventArgs e)
+        {
+            Canvas canvas = sender as Canvas;
+            Dictionary<string, object> data = 
+                e.Data.GetData(DataFormats.Serializable) as Dictionary<string, object>;
+
+            if (data["shape"] is Shape shape
+                && data["cursorToLeftDistance"] is double cursorToLeftDistance
+                && data["cursorToTopDistance"] is double cursorToTopDistance)
+            {
+                Point cursorPos = e.GetPosition(canvas);
+
+                Canvas.SetLeft(shape, cursorPos.X - cursorToLeftDistance);
+                Canvas.SetTop(shape, cursorPos.Y - cursorToTopDistance);
+            }
+        }
+
+        private static void SetupDragAndDrop(Shape shape)
+        {
+            shape.MouseLeftButtonDown += (s, e) =>
+            {
+                Debug.WriteLine("drag start");
+
+                double cursorToLeftDistance = Mouse.GetPosition(_mainCanvas).X - Canvas.GetLeft(shape);
+                double cursorToTopDistance = Mouse.GetPosition(_mainCanvas).Y - Canvas.GetTop(shape);
+
+                DataObject data = new DataObject(DataFormats.Serializable,
+                    new Dictionary<string, object>() {
+                        { "shape", shape },
+                        { "cursorToLeftDistance", cursorToLeftDistance },
+                        { "cursorToTopDistance", cursorToTopDistance }
+                    });
+                DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
+            };
         }
     }
 }

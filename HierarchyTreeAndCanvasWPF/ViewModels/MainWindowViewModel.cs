@@ -65,7 +65,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void AddShape(Canvas canvas)
+        public Shape AddShape(Canvas canvas)
         {
             double mousePosX = Mouse.GetPosition(canvas).X;
             double mousePosY = Mouse.GetPosition(canvas).Y;
@@ -87,7 +87,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 Canvas.SetTop(newRectangle, newCanvasItem.Y);
 
                 CanvasShapes.Add(newRectangle);
-                SetupDragAndDrop(newRectangle);
+                return newRectangle;
             }
             else if (ShapeToAdd == "ellipse")
             {
@@ -106,7 +106,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 Canvas.SetTop(newEllipse, newCanvasItem.Y);
 
                 CanvasShapes.Add(newEllipse);
-                SetupDragAndDrop(newEllipse);
+                return newEllipse;
             }
             else if (ShapeToAdd == "triangle")
             {
@@ -128,18 +128,10 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 Canvas.SetTop(newTriangle, newCanvasItem.Y);
 
                 CanvasShapes.Add(newTriangle);
-                SetupDragAndDrop(newTriangle);
+                return newTriangle;
             }
-        }
 
-        private static void SetupDragAndDrop(Shape shape)
-        {
-            shape.MouseEnter += (s, e) => { Debug.WriteLine("enter"); };
-            shape.MouseRightButtonDown += (s, e) =>
-            {
-                Debug.WriteLine("drag start");
-                DragDrop.DoDragDrop(shape, shape, DragDropEffects.Move);
-            };
+            return null;
         }
     }
 }
