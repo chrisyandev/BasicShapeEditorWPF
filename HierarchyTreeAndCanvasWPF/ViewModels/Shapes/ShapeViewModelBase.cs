@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HierarchyTreeAndCanvasWPF.ViewModels
+namespace HierarchyTreeAndCanvasWPF.ViewModels.Shapes
 {
     public abstract class ShapeViewModelBase
     {

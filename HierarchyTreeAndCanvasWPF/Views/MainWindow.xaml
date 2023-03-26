@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HierarchyTreeAndCanvasWPF.Views"
         xmlns:vm="clr-namespace:HierarchyTreeAndCanvasWPF.ViewModels"
+        xmlns:shapes="clr-namespace:HierarchyTreeAndCanvasWPF.ViewModels.Shapes"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
@@ -26,13 +27,13 @@
         <ItemsControl Grid.Column="1"
                       ItemsSource="{Binding CanvasItems}">
             <ItemsControl.Resources>
-                <DataTemplate DataType="{x:Type vm:RectangleViewModel}">
+                <DataTemplate DataType="{x:Type shapes:RectangleViewModel}">
                     <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:EllipseViewModel}">
+                <DataTemplate DataType="{x:Type shapes:EllipseViewModel}">
                     <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:TriangleViewModel}">
+                <DataTemplate DataType="{x:Type shapes:TriangleViewModel}">
                     <Polygon Points="{Binding Points}" Fill="{Binding Fill}"/>
                 </DataTemplate>
             </ItemsControl.Resources>
@@ -61,21 +62,21 @@
             <Button Grid.Column="0"
                     Content="Rectangle"
                     Background="{Binding ShapeToAdd,
-                                         Converter={StaticResource ButtonColorConverter},
+                                         Converter={StaticResource ActiveButtonConverter},
                                          ConverterParameter=rectangle}"
                     Command="{Binding SetShapeToAddCommand}"
                     CommandParameter="rectangle"/>
             <Button Grid.Column="1"
                     Content="Ellipse"
                     Background="{Binding ShapeToAdd,
-                                         Converter={StaticResource ButtonColorConverter},
+                                         Converter={StaticResource ActiveButtonConverter},
                                          ConverterParameter=ellipse}"
                     Command="{Binding SetShapeToAddCommand}"
                     CommandParameter="ellipse"/>
             <Button Grid.Column="2"
                     Content="Triangle"
                     Background="{Binding ShapeToAdd,
-                                         Converter={StaticResource ButtonColorConverter},
+                                         Converter={StaticResource ActiveButtonConverter},
                                          ConverterParameter=triangle}"
                     Command="{Binding SetShapeToAddCommand}"
                     CommandParameter="triangle"/>

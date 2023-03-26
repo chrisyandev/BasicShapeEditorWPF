@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using HierarchyTreeAndCanvasWPF.ViewModels.Shapes;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {

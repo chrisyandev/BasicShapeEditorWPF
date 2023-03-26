@@ -9,7 +9,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace HierarchyTreeAndCanvasWPF.ViewModels
+namespace HierarchyTreeAndCanvasWPF.ViewModels.Shapes
 {
     public class TriangleViewModel : ShapeViewModelBase
     {

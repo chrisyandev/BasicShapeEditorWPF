@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace HierarchyTreeAndCanvasWPF.Converters
 {
-    internal class ButtonColorConverter : IValueConverter
+    internal class ActiveButtonConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -5,6 +5,6 @@
              xmlns:converters="clr-namespace:HierarchyTreeAndCanvasWPF.Converters"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-        <converters:ButtonColorConverter x:Key="ButtonColorConverter"/>
+        <converters:ActiveButtonConverter x:Key="ActiveButtonConverter"/>
     </Application.Resources>
 </Application>
