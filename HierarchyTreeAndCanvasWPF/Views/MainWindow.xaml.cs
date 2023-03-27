@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using HierarchyTreeAndCanvasWPF.Adorners;
 using HierarchyTreeAndCanvasWPF.Extensions;
 using HierarchyTreeAndCanvasWPF.Models;
 using HierarchyTreeAndCanvasWPF.ViewModels;
@@ -96,6 +97,11 @@ namespace HierarchyTreeAndCanvasWPF.Views
                         { "cursorToTopDistance", cursorToTopDistance }
                     });
                 DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
+            };
+
+            shape.MouseLeftButtonDown += (s, e) =>
+            {
+                AdornerLayer.GetAdornerLayer(_mainCanvas).Add(new ResizeAdorner(shape));
             };
         }
     }
