@@ -116,12 +116,58 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
         private void Thumb2_DragDelta(object sender, DragDeltaEventArgs e)
         {
             FrameworkElement element = (FrameworkElement)AdornedElement;
+            double left = Canvas.GetLeft(element);
+            double top = Canvas.GetTop(element);
 
-            double newHeight = element.Height + e.VerticalChange;
-            double newWidth = element.Width + e.HorizontalChange;
+            // Dragging really quickly past the limits resulted in
+            // resize being a few pixels off. Set to 0 to see what happens.
+            double buffer = 10;
 
-            element.Height = newHeight < 0 ? 0 : newHeight;
-            element.Width = newWidth < 0 ? 0 : newWidth;
+            double newWidth = element.Width;
+            double newHeight = element.Height;
+
+            // shape left edge is the limit
+            if (element.Width + e.HorizontalChange >= 0 - buffer)
+            {
+                newWidth = element.Width + e.HorizontalChange;
+
+                // For fixing imprecise resize during fast dragging
+                if (newWidth < 0)
+                {
+                    double unitsOverLimit = 0 - newWidth;
+                    newWidth += unitsOverLimit;
+                }
+            }
+
+            // shape top edge is the limit
+            if (element.Height + e.VerticalChange >= 0 - buffer)
+            {
+                newHeight = element.Height + e.VerticalChange;
+
+                // For fixing imprecise resize during fast dragging
+                if (newHeight < 0)
+                {
+                    double unitsOverLimit = 0 - newHeight;
+                    newHeight += unitsOverLimit;
+                }
+            }
+
+            // canvas right side is the limit
+            if (left + newWidth > _canvas.ActualWidth)
+            {
+                double unitsOverLimit = (left + newWidth) - _canvas.ActualWidth;
+                newWidth -= unitsOverLimit;
+            }
+
+            // canvas bottom side is the limit
+            if (top + newHeight > _canvas.ActualHeight)
+            {
+                double unitsOverLimit = (top + newHeight) - _canvas.ActualHeight;
+                newHeight -= unitsOverLimit;
+            }
+
+            element.Width = newWidth;
+            element.Height = newHeight;
         }
 
         protected override Visual GetVisualChild(int index)
