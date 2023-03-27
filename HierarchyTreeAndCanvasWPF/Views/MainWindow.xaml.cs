@@ -101,7 +101,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
 
             shape.MouseLeftButtonDown += (s, e) =>
             {
-                AdornerLayer.GetAdornerLayer(_mainCanvas).Add(new ResizeAdorner(shape));
+                AdornerLayer.GetAdornerLayer(_mainCanvas).Add(new ResizeAdorner(shape, _mainCanvas));
             };
         }
     }

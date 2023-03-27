@@ -14,31 +14,34 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 {
     public class ResizeAdorner : Adorner
     {
-        VisualCollection AdornerVisuals;
-        Thumb thumb1, thumb2;
+        private Canvas _canvas;
+        private VisualCollection _adornerVisuals;
+        private Thumb _thumb1, _thumb2;
 
-        public ResizeAdorner(UIElement adornedElement) : base(adornedElement)
+        public ResizeAdorner(UIElement adornedElement, Canvas canvas) : base(adornedElement)
         {
-            AdornerVisuals = new VisualCollection(this);
+            _canvas = canvas;
 
-            thumb1 = new Thumb()
+            _adornerVisuals = new VisualCollection(this);
+
+            _thumb1 = new Thumb()
             {
                 Background = Brushes.Coral,
                 Height = 10,
                 Width = 10
             };
-            thumb2 = new Thumb()
+            _thumb2 = new Thumb()
             {
                 Background = Brushes.Coral,
                 Height = 10,
                 Width = 10
             };
 
-            thumb1.DragDelta += Thumb1_DragDelta;
-            thumb2.DragDelta += Thumb2_DragDelta;
+            _thumb1.DragDelta += Thumb1_DragDelta;
+            _thumb2.DragDelta += Thumb2_DragDelta;
 
-            AdornerVisuals.Add(thumb1);
-            AdornerVisuals.Add(thumb2);
+            _adornerVisuals.Add(_thumb1);
+            _adornerVisuals.Add(_thumb2);
         }
 
         private void Thumb1_DragDelta(object sender, DragDeltaEventArgs e)
@@ -53,11 +56,16 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             // resize being a few pixels off. Set to 0 to see what happens.
             double buffer = 10;
 
-            // right edge is the limit
+            double newWidth = element.Width;
+            double newLeft = left;
+            double newHeight = element.Height;
+            double newTop = top;
+
+            // shape right edge is the limit
             if (left + e.HorizontalChange <= right + buffer)
             {
-                double newWidth = element.Width - e.HorizontalChange;
-                double newLeft = left + e.HorizontalChange;
+                newWidth = element.Width - e.HorizontalChange;
+                newLeft = left + e.HorizontalChange;
 
                 // For fixing imprecise resize during fast dragging
                 if (newWidth < 0)
@@ -66,16 +74,13 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
                     newWidth += unitsOverLimit;
                     newLeft -= unitsOverLimit;
                 }
-
-                element.Width = newWidth;
-                Canvas.SetLeft(element, newLeft);
             }
 
-            // bottom edge is the limit
+            // shape bottom edge is the limit
             if (top + e.VerticalChange <= bottom + buffer)
             {
-                double newHeight = element.Height - e.VerticalChange;
-                double newTop = top + e.VerticalChange;
+                newHeight = element.Height - e.VerticalChange;
+                newTop = top + e.VerticalChange;
 
                 // For fixing imprecise resize during fast dragging
                 if (newHeight < 0)
@@ -84,10 +89,28 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
                     newHeight += unitsOverLimit;
                     newTop -= unitsOverLimit;
                 }
-
-                element.Height = newHeight;
-                Canvas.SetTop(element, newTop);
             }
+
+            // canvas left side is the limit
+            if (newLeft < 0)
+            {
+                double unitsOverLimit = 0 - newLeft;
+                newWidth -= unitsOverLimit;
+                newLeft += unitsOverLimit;
+            }
+
+            // canvas top side is the limit
+            if (newTop < 0)
+            {
+                double unitsOverLimit = 0 - newTop;
+                newHeight -= unitsOverLimit;
+                newTop += unitsOverLimit;
+            }
+
+            element.Width = newWidth;
+            Canvas.SetLeft(element, newLeft);
+            element.Height = newHeight;
+            Canvas.SetTop(element, newTop);
         }
 
         private void Thumb2_DragDelta(object sender, DragDeltaEventArgs e)
@@ -103,18 +126,18 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
         protected override Visual GetVisualChild(int index)
         {
-            return AdornerVisuals[index];
+            return _adornerVisuals[index];
         }
 
-        protected override int VisualChildrenCount => AdornerVisuals.Count;
+        protected override int VisualChildrenCount => _adornerVisuals.Count;
 
         protected override Size ArrangeOverride(Size finalSize)
         {
             double thumbSize = 10;
 
-            thumb1.Arrange(new Rect(-(thumbSize / 2), -(thumbSize / 2), thumbSize, thumbSize));
+            _thumb1.Arrange(new Rect(-(thumbSize / 2), -(thumbSize / 2), thumbSize, thumbSize));
 
-            thumb2.Arrange(new Rect(AdornedElement.DesiredSize.Width - (thumbSize / 2),
+            _thumb2.Arrange(new Rect(AdornedElement.DesiredSize.Width - (thumbSize / 2),
                                     AdornedElement.DesiredSize.Height - (thumbSize / 2),
                                     thumbSize, thumbSize));
 
