@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HierarchyTreeAndCanvasWPF.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace HierarchyTreeAndCanvasWPF.Adorners
 {
@@ -116,6 +118,13 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
         private void Thumb2_DragDelta(object sender, DragDeltaEventArgs e)
         {
             FrameworkElement element = (FrameworkElement)AdornedElement;
+
+            if (element is Polygon)
+            {
+                element.Resize(e.HorizontalChange, e.VerticalChange);
+                return;
+            }
+
             double left = Canvas.GetLeft(element);
             double top = Canvas.GetTop(element);
 
