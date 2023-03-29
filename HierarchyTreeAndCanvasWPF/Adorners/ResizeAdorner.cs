@@ -49,6 +49,14 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
         private void Thumb1_DragDelta(object sender, DragDeltaEventArgs e)
         {
             FrameworkElement element = (FrameworkElement)AdornedElement;
+
+            if (element is Polygon)
+            {
+                element.ShiftLeftSide(e.HorizontalChange);
+                element.ShiftTopSide(e.VerticalChange);
+                return;
+            }
+
             double left = Canvas.GetLeft(element);
             double top = Canvas.GetTop(element);
             double right = left + element.Width;
