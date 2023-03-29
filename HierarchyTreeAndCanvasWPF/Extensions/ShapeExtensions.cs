@@ -26,7 +26,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
             else if (shape is Polygon triangle)
             {
-                ShiftLeftSideTriangle(triangle, units);
+                ShiftLeftSideTriangle(triangle, units, leftBoundary);
             }
         }
 
@@ -42,7 +42,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
             else if (shape is Polygon triangle)
             {
-                ShiftTopSideTriangle(triangle, units);
+                ShiftTopSideTriangle(triangle, units, topBoundary);
             }
         }
 
@@ -58,7 +58,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
             else if (shape is Polygon triangle)
             {
-                ShiftRightSideTriangle(triangle, units);
+                ShiftRightSideTriangle(triangle, units, rightBoundary);
             }
         }
 
@@ -74,7 +74,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
             else if (shape is Polygon triangle)
             {
-                ShiftBottomSideTriangle(triangle, units);
+                ShiftBottomSideTriangle(triangle, units, bottomBoundary);
             }
         }
 
@@ -85,7 +85,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             double newWidth, newLeft;
 
-            // shape right edge is the limit
+            // shape right side is the limit
             if (left + units > right)
             {
                 newWidth = 0;
@@ -116,7 +116,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             double newHeight, newTop;
 
-            // shape bottom edge is the limit
+            // shape bottom side is the limit
             if (top + units > bottom)
             {
                 newHeight = 0;
@@ -146,7 +146,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             double newWidth;
 
-            // shape left edge is the limit
+            // shape left side is the limit
             if (shape.Width + units < 0)
             {
                 newWidth = 0;
@@ -172,7 +172,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             double newHeight;
 
-            // shape top edge is the limit
+            // shape top side is the limit
             if (shape.Height + units < 0)
             {
                 newHeight = 0;
@@ -192,7 +192,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             shape.Height = newHeight;
         }
 
-        private static void ShiftLeftSideTriangle(Polygon triangle, double units)
+        private static void ShiftLeftSideTriangle(Polygon triangle, double units, double leftBoundary)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -232,6 +232,14 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
                 newWidth = minWidth;
             }
 
+            // canvas left side is limit
+            if (newLeft < leftBoundary)
+            {
+                double unitsOverLimit = leftBoundary - newLeft;
+                newWidth -= unitsOverLimit;
+                newLeft += unitsOverLimit;
+            }
+
             Canvas.SetLeft(triangle, newLeft);
             newTopPoint = new Point(newWidth / 2, topPoint.Y);
             newRightPoint = new Point(newWidth, rightPoint.Y);
@@ -242,7 +250,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             triangle.Points = newPoints;
         }
 
-        private static void ShiftTopSideTriangle(Polygon triangle, double units)
+        private static void ShiftTopSideTriangle(Polygon triangle, double units, double topBoundary)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -282,6 +290,14 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
                 newHeight = minHeight;
             }
 
+            // canvas top side is the limit
+            if (newTop < topBoundary)
+            {
+                double unitsOverLimit = topBoundary - newTop;
+                newHeight -= unitsOverLimit;
+                newTop += unitsOverLimit;
+            }
+
             Canvas.SetTop(triangle, newTop);
             newLeftPoint = new Point(leftPoint.X, newHeight);
             newRightPoint = new Point(rightPoint.X, newHeight);
@@ -292,7 +308,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             triangle.Points = newPoints;
         }
 
-        private static void ShiftRightSideTriangle(Polygon triangle, double units)
+        private static void ShiftRightSideTriangle(Polygon triangle, double units, double rightBoundary)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -330,6 +346,13 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
                 newWidth = minWidth;
             }
 
+            // canvas right side is the limit
+            if (Canvas.GetLeft(triangle) + newWidth > rightBoundary)
+            {
+                double unitsOverLimit = (Canvas.GetLeft(triangle) + newWidth) - rightBoundary;
+                newWidth -= unitsOverLimit;
+            }
+
             newRightPoint = new Point(newWidth, rightPoint.Y);
             newTopPoint = new Point(newWidth / 2, topPoint.Y);
 
@@ -339,7 +362,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             triangle.Points = newPoints;
         }
 
-        private static void ShiftBottomSideTriangle(Polygon triangle, double units)
+        private static void ShiftBottomSideTriangle(Polygon triangle, double units, double bottomBoundary)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -375,6 +398,13 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             if (newHeight < minHeight)
             {
                 newHeight = minHeight;
+            }
+
+            // canvas bottom side is the limit
+            if (Canvas.GetTop(triangle) + newHeight > bottomBoundary)
+            {
+                double unitsOverLimit = (Canvas.GetTop(triangle) + newHeight) - bottomBoundary;
+                newHeight -= unitsOverLimit;
             }
 
             newLeftPoint = new Point(leftPoint.X, newHeight);
