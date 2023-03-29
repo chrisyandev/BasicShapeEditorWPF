@@ -220,24 +220,21 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             Point newLeftPoint = leftPoint;
             Point newTopPoint = topPoint;
             Point newRightPoint = rightPoint;
+            double minWidth = 1;
+            double width = rightPoint.X - leftPoint.X;
+            double newLeft = Canvas.GetLeft(triangle) + units;
+            double newWidth = width - units;
 
             // triangle right side is limit
-            if (leftPoint.X + units < pointsXAxis.Max())
+            if (newWidth < minWidth)
             {
-                // takes care of moving left point
-                Canvas.SetLeft(triangle, Canvas.GetLeft(triangle) + units);
-                // adjust right point based on how much left point moves
-                newRightPoint = new Point(rightPoint.X - units, rightPoint.Y);
-            }
-            // min width is 1 unit
-            else
-            {
-                Canvas.SetLeft(triangle, Canvas.GetLeft(triangle) + topPoint.X - 0.5);
-                newRightPoint = new Point(topPoint.X + 0.5, rightPoint.Y);
+                newLeft = Canvas.GetLeft(triangle) + width - minWidth;
+                newWidth = minWidth;
             }
 
-            // accurately calculates inbetween point
-            newTopPoint = new Point((newRightPoint.X - newLeftPoint.X) / 2, topPoint.Y);
+            Canvas.SetLeft(triangle, newLeft);
+            newTopPoint = new Point(newWidth / 2, topPoint.Y);
+            newRightPoint = new Point(newWidth, rightPoint.Y);
 
             newPoints.Add(newLeftPoint);
             newPoints.Add(newTopPoint);
