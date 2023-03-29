@@ -54,43 +54,30 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             double right = left + element.Width;
             double bottom = top + element.Height;
 
-            // Dragging really quickly past the limits resulted in
-            // resize being a few pixels off. Set to 0 to see what happens.
-            double buffer = 10;
-
-            double newWidth = element.Width;
-            double newLeft = left;
-            double newHeight = element.Height;
-            double newTop = top;
+            double newWidth, newLeft, newHeight, newTop;
 
             // shape right edge is the limit
-            if (left + e.HorizontalChange <= right + buffer)
+            if (left + e.HorizontalChange > right)
+            {
+                newWidth = 0;
+                newLeft = right;
+            }
+            else
             {
                 newWidth = element.Width - e.HorizontalChange;
                 newLeft = left + e.HorizontalChange;
-
-                // For fixing imprecise resize during fast dragging
-                if (newWidth < 0)
-                {
-                    double unitsOverLimit = 0 - newWidth;
-                    newWidth += unitsOverLimit;
-                    newLeft -= unitsOverLimit;
-                }
             }
 
             // shape bottom edge is the limit
-            if (top + e.VerticalChange <= bottom + buffer)
+            if (top + e.VerticalChange > bottom)
+            {
+                newHeight = 0;
+                newTop = bottom;
+            }
+            else
             {
                 newHeight = element.Height - e.VerticalChange;
                 newTop = top + e.VerticalChange;
-
-                // For fixing imprecise resize during fast dragging
-                if (newHeight < 0)
-                {
-                    double unitsOverLimit = 0 - newHeight;
-                    newHeight += unitsOverLimit;
-                    newTop -= unitsOverLimit;
-                }
             }
 
             // canvas left side is the limit
@@ -130,37 +117,26 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             double left = Canvas.GetLeft(element);
             double top = Canvas.GetTop(element);
 
-            // Dragging really quickly past the limits resulted in
-            // resize being a few pixels off. Set to 0 to see what happens.
-            double buffer = 10;
-
-            double newWidth = element.Width;
-            double newHeight = element.Height;
+            double newWidth, newHeight;
 
             // shape left edge is the limit
-            if (element.Width + e.HorizontalChange >= 0 - buffer)
+            if (element.Width + e.HorizontalChange < 0)
+            {
+                newWidth = 0;
+            }
+            else
             {
                 newWidth = element.Width + e.HorizontalChange;
-
-                // For fixing imprecise resize during fast dragging
-                if (newWidth < 0)
-                {
-                    double unitsOverLimit = 0 - newWidth;
-                    newWidth += unitsOverLimit;
-                }
             }
 
             // shape top edge is the limit
-            if (element.Height + e.VerticalChange >= 0 - buffer)
+            if (element.Height + e.VerticalChange < 0)
+            {
+                newHeight = 0;
+            }
+            else
             {
                 newHeight = element.Height + e.VerticalChange;
-
-                // For fixing imprecise resize during fast dragging
-                if (newHeight < 0)
-                {
-                    double unitsOverLimit = 0 - newHeight;
-                    newHeight += unitsOverLimit;
-                }
             }
 
             // canvas right side is the limit
