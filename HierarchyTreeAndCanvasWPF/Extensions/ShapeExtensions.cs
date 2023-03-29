@@ -297,40 +297,45 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
 
+            Point leftPoint;
+            Point topPoint;
+            Point rightPoint;
+
             foreach (Point point in triangle.Points)
             {
-                // leftmost point
                 if (point.X == pointsXAxis.Min())
                 {
-                    newPoints.Add(new Point(point.X, point.Y));
+                    leftPoint = point;
                 }
-                // rightmost point
-                else if (point.X == pointsXAxis.Max())
-                {
-                    // detect if right side will overlap with left, leave a 1 unit gap between left and right side
-                    if (pointsXAxis.Max() + units > pointsXAxis.Min())
-                    {
-                        newPoints.Add(new Point(pointsXAxis.Max() + units, point.Y));
-                    }
-                    else
-                    {
-                        newPoints.Add(new Point(pointsXAxis.Min() + 1, point.Y));
-                    }
-                }
-                // inbetween point
                 else if (point.X > pointsXAxis.Min() && point.X < pointsXAxis.Max())
                 {
-                    // detect if right side will overlap with left, leave a 0.5 unit gap between left -> mid and mid -> right
-                    if (pointsXAxis.Max() + units > pointsXAxis.Min())
-                    {
-                        newPoints.Add(new Point(point.X + (units / 2), point.Y));
-                    }
-                    else
-                    {
-                        newPoints.Add(new Point(pointsXAxis.Min() + 0.5, point.Y));
-                    }
+                    topPoint = point;
+                }
+                else if (point.X == pointsXAxis.Max())
+                {
+                    rightPoint = point;
                 }
             }
+
+            Point newLeftPoint = leftPoint;
+            Point newTopPoint = topPoint;
+            Point newRightPoint = rightPoint;
+            double minWidth = 1;
+            double width = rightPoint.X - leftPoint.X;
+            double newWidth = width + units;
+
+            // triangle left side is limit
+            if (newWidth < minWidth)
+            {
+                newWidth = minWidth;
+            }
+
+            newRightPoint = new Point(newWidth, rightPoint.Y);
+            newTopPoint = new Point(newWidth / 2, topPoint.Y);
+
+            newPoints.Add(newLeftPoint);
+            newPoints.Add(newTopPoint);
+            newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
         }
 
@@ -339,24 +344,45 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
 
+            Point leftPoint;
+            Point topPoint;
+            Point rightPoint;
+
             foreach (Point point in triangle.Points)
             {
-                // leftmost point
                 if (point.X == pointsXAxis.Min())
                 {
-                    newPoints.Add(new Point(point.X, point.Y + units));
+                    leftPoint = point;
                 }
-                // rightmost point
+                else if (point.X > pointsXAxis.Min() && point.X < pointsXAxis.Max())
+                {
+                    topPoint = point;
+                }
                 else if (point.X == pointsXAxis.Max())
                 {
-                    newPoints.Add(new Point(point.X, point.Y + units));
-                }
-                // inbetween point
-                else
-                {
-                    newPoints.Add(new Point(point.X, point.Y));
+                    rightPoint = point;
                 }
             }
+
+            Point newLeftPoint = leftPoint;
+            Point newTopPoint = topPoint;
+            Point newRightPoint = rightPoint;
+            double minHeight = 1;
+            double height = leftPoint.Y - topPoint.Y;
+            double newHeight = height + units;
+
+            // triangle top side is limit
+            if (newHeight < minHeight)
+            {
+                newHeight = minHeight;
+            }
+
+            newLeftPoint = new Point(leftPoint.X, newHeight);
+            newRightPoint = new Point(rightPoint.X, newHeight);
+
+            newPoints.Add(newLeftPoint);
+            newPoints.Add(newTopPoint);
+            newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
         }
     }
