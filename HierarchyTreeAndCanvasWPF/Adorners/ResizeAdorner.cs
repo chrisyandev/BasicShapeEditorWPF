@@ -18,7 +18,7 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
     {
         private Canvas _canvas;
         private VisualCollection _adornerVisuals;
-        private Thumb _thumb1, _thumb2;
+        private Thumb _topLeftThumb, _topRightThumb, _bottomLeftThumb, _bottomRightThumb;
 
         public ResizeAdorner(UIElement adornedElement, Canvas canvas) : base(adornedElement)
         {
@@ -26,27 +26,43 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
             _adornerVisuals = new VisualCollection(this);
 
-            _thumb1 = new Thumb()
+            _topLeftThumb = new Thumb()
             {
                 Background = Brushes.Coral,
                 Height = 10,
                 Width = 10
             };
-            _thumb2 = new Thumb()
+            _topRightThumb = new Thumb()
+            {
+                Background = Brushes.Coral,
+                Height = 10,
+                Width = 10
+            };
+            _bottomLeftThumb = new Thumb()
+            {
+                Background = Brushes.Coral,
+                Height = 10,
+                Width = 10
+            };
+            _bottomRightThumb = new Thumb()
             {
                 Background = Brushes.Coral,
                 Height = 10,
                 Width = 10
             };
 
-            _thumb1.DragDelta += Thumb1_DragDelta;
-            _thumb2.DragDelta += Thumb2_DragDelta;
+            _topLeftThumb.DragDelta += TopLeftThumb_DragDelta;
+            _topRightThumb.DragDelta += TopRightThumb_DragDelta;
+            _bottomLeftThumb.DragDelta += BottomLeftThumb_DragDelta;
+            _bottomRightThumb.DragDelta += BottomRightThumb_DragDelta;
 
-            _adornerVisuals.Add(_thumb1);
-            _adornerVisuals.Add(_thumb2);
+            _adornerVisuals.Add(_topLeftThumb);
+            _adornerVisuals.Add(_topRightThumb);
+            _adornerVisuals.Add(_bottomLeftThumb);
+            _adornerVisuals.Add(_bottomRightThumb);
         }
 
-        private void Thumb1_DragDelta(object sender, DragDeltaEventArgs e)
+        private void TopLeftThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (AdornedElement is Shape shape)
             {
@@ -55,7 +71,25 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             }
         }
 
-        private void Thumb2_DragDelta(object sender, DragDeltaEventArgs e)
+        private void TopRightThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (AdornedElement is Shape shape)
+            {
+                shape.ShiftRightSide(e.HorizontalChange, _canvas.ActualWidth);
+                shape.ShiftTopSide(e.VerticalChange, 0);
+            }
+        }
+
+        private void BottomLeftThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (AdornedElement is Shape shape)
+            {
+                shape.ShiftLeftSide(e.HorizontalChange, 0);
+                shape.ShiftBottomSide(e.VerticalChange, _canvas.ActualHeight);
+            }
+        }
+
+        private void BottomRightThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (AdornedElement is Shape shape)
             {
@@ -75,11 +109,18 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
         {
             double thumbSize = 10;
 
-            _thumb1.Arrange(new Rect(-(thumbSize / 2), -(thumbSize / 2), thumbSize, thumbSize));
+            _topLeftThumb.Arrange(new Rect(-(thumbSize / 2), -(thumbSize / 2), thumbSize, thumbSize));
 
-            _thumb2.Arrange(new Rect(AdornedElement.DesiredSize.Width - (thumbSize / 2),
-                                    AdornedElement.DesiredSize.Height - (thumbSize / 2),
-                                    thumbSize, thumbSize));
+            _topRightThumb.Arrange(new Rect(AdornedElement.DesiredSize.Width - (thumbSize / 2),
+                                    -(thumbSize / 2), thumbSize, thumbSize));
+
+            _bottomLeftThumb.Arrange(new Rect(-(thumbSize / 2),
+                                        AdornedElement.DesiredSize.Height - (thumbSize / 2),
+                                        thumbSize, thumbSize));
+
+            _bottomRightThumb.Arrange(new Rect(AdornedElement.DesiredSize.Width - (thumbSize / 2),
+                                        AdornedElement.DesiredSize.Height - (thumbSize / 2),
+                                        thumbSize, thumbSize));
 
             return base.ArrangeOverride(finalSize);
         }
