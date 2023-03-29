@@ -121,7 +121,9 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
             if (element is Polygon)
             {
-                element.Resize(e.HorizontalChange, e.VerticalChange);
+                element.ShiftRightSide(e.HorizontalChange);
+                element.ShiftBottomSide(e.VerticalChange);
+                //element.Resize(e.HorizontalChange, e.VerticalChange);
                 return;
             }
 
