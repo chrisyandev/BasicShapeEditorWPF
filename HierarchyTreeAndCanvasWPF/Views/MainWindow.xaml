@@ -30,6 +30,7 @@
                     <Canvas Initialized="Canvas_Initialized"
                             Background="Orange"
                             AllowDrop="True"
+                            MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
                             MouseRightButtonDown="Canvas_MouseRightButtonDown"
                             DragOver="Canvas_DragOver"/>
                 </ItemsPanelTemplate>

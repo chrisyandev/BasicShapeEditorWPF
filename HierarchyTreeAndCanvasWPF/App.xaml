@@ -5,6 +5,16 @@
              xmlns:converters="clr-namespace:HierarchyTreeAndCanvasWPF.Converters"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-
+        <Style TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Ellipse Fill="{TemplateBinding Background}"
+                                 Width="{TemplateBinding Width}"
+                                 Height="{TemplateBinding Height}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

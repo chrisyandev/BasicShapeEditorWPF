@@ -16,10 +16,10 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 {
     public class ResizeAdorner : Adorner
     {
-        private static readonly Brush ThumbBrush = Brushes.Purple;
+        private static readonly Brush ThumbBrush = Brushes.SlateBlue;
         private static readonly Brush SelectionRectBrush = Brushes.White;
         private const double ThumbSize = 10;
-        private const double SelectionRectStrokeThickness = 2;
+        private const double SelectionRectStrokeThickness = 1.5;
 
         private Canvas _canvas;
         private VisualCollection _adornerVisuals;
@@ -36,7 +36,7 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             {
                 Stroke = SelectionRectBrush,
                 StrokeThickness = SelectionRectStrokeThickness,
-                StrokeDashArray = { 3, 2 }
+                StrokeDashArray = { 2, 2 }
             };
             _adornerVisuals.Add(_selectionRect);
 

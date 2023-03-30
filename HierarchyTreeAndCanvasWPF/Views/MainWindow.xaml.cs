@@ -38,10 +38,37 @@ namespace HierarchyTreeAndCanvasWPF.Views
             _mainCanvas = sender as Canvas;
         }
 
+        private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(_mainCanvas);
+
+            if (e.Source is Shape shape)
+            {
+                Adorner[] adorners = adornerLayer.GetAdorners(shape);
+
+                if (adorners == null)
+                {
+                    adornerLayer.Add(new ResizeAdorner(shape, _mainCanvas));
+                }
+            }
+            else if (e.Source is Canvas)
+            {
+                Shape[] canvasShapes = (DataContext as MainWindowViewModel).CanvasShapes.ToArray();
+
+                foreach (Shape s in canvasShapes)
+                {
+                    Adorner[] shapeAdorners = adornerLayer.GetAdorners(s);
+
+                    if (shapeAdorners != null && shapeAdorners.Length > 0)
+                    {
+                        adornerLayer.Remove(shapeAdorners[0]);
+                    }
+                }
+            }
+        }
+
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Debug.WriteLine("canvas right clicked");
-
             Canvas canvas = sender as Canvas;
 
             Shape shape = (DataContext as MainWindowViewModel).AddShape(canvas);
@@ -83,26 +110,25 @@ namespace HierarchyTreeAndCanvasWPF.Views
 
         private static void SetupDragAndDrop(Shape shape)
         {
-            shape.MouseLeftButtonDown += (s, e) =>
+            shape.MouseMove += (s, e) =>
             {
-                Debug.WriteLine("drag start");
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    Debug.WriteLine("drag start");
 
-                double cursorToLeftDistance = Mouse.GetPosition(_mainCanvas).X - Canvas.GetLeft(shape);
-                double cursorToTopDistance = Mouse.GetPosition(_mainCanvas).Y - Canvas.GetTop(shape);
+                    double cursorToLeftDistance = Mouse.GetPosition(_mainCanvas).X - Canvas.GetLeft(shape);
+                    double cursorToTopDistance = Mouse.GetPosition(_mainCanvas).Y - Canvas.GetTop(shape);
 
-                DataObject data = new DataObject(DataFormats.Serializable,
-                    new Dictionary<string, object>() {
+                    DataObject data = new DataObject(DataFormats.Serializable,
+                        new Dictionary<string, object>() {
                         { "shape", shape },
                         { "cursorToLeftDistance", cursorToLeftDistance },
                         { "cursorToTopDistance", cursorToTopDistance }
-                    });
-                DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
-            };
-
-            shape.MouseLeftButtonDown += (s, e) =>
-            {
-                AdornerLayer.GetAdornerLayer(_mainCanvas).Add(new ResizeAdorner(shape, _mainCanvas));
+                        });
+                    DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
+                }
             };
         }
+
     }
 }
