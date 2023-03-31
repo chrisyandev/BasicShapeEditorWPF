@@ -39,11 +39,14 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             });
 
             CanvasShapes = new ObservableCollection<Shape>();
+            SelectedCanvasShapes = new ObservableCollection<Shape>();
         }
 
         public ObservableCollection<TreeItem> TreeItems { get; set; }
 
         public ObservableCollection<Shape> CanvasShapes { get; set; }
+
+        public ObservableCollection<Shape> SelectedCanvasShapes { get; set; }
 
         public string ShapeToAdd
         {

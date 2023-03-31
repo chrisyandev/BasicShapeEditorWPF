@@ -27,43 +27,31 @@ namespace HierarchyTreeAndCanvasWPF.Views
     public partial class MainWindow : Window
     {
         private static Canvas _mainCanvas;
+        private AdornerLayer _mainCanvasAdornerLayer;
+        private MainWindowViewModel _vm;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            _vm = DataContext as MainWindowViewModel;
         }
 
         private void Canvas_Initialized(object sender, EventArgs e)
         {
             _mainCanvas = sender as Canvas;
+            _mainCanvasAdornerLayer = AdornerLayer.GetAdornerLayer(_mainCanvas);
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(_mainCanvas);
-
             if (e.Source is Shape shape)
             {
-                Adorner[] adorners = adornerLayer.GetAdorners(shape);
-
-                if (adorners == null)
-                {
-                    adornerLayer.Add(new ResizeAdorner(shape, _mainCanvas));
-                }
+                SelectShape(shape);
             }
             else if (e.Source is Canvas)
             {
-                Shape[] canvasShapes = (DataContext as MainWindowViewModel).CanvasShapes.ToArray();
-
-                foreach (Shape s in canvasShapes)
-                {
-                    Adorner[] shapeAdorners = adornerLayer.GetAdorners(s);
-
-                    if (shapeAdorners != null && shapeAdorners.Length > 0)
-                    {
-                        adornerLayer.Remove(shapeAdorners[0]);
-                    }
-                }
+                DeselectAllShapes();
             }
         }
 
@@ -71,7 +59,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
         {
             Canvas canvas = sender as Canvas;
 
-            Shape shape = (DataContext as MainWindowViewModel).AddShape(canvas);
+            Shape shape = _vm.AddShape(canvas);
 
             if (shape != null)
             {
@@ -108,7 +96,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
             }
         }
 
-        private static void SetupDragAndDrop(Shape shape)
+        private void SetupDragAndDrop(Shape shape)
         {
             shape.MouseMove += (s, e) =>
             {
@@ -128,6 +116,38 @@ namespace HierarchyTreeAndCanvasWPF.Views
                     DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
                 }
             };
+        }
+
+        private void SelectShape(Shape shape)
+        {
+            Adorner[] adorners = _mainCanvasAdornerLayer.GetAdorners(shape);
+
+            if (adorners == null)
+            {
+                _mainCanvasAdornerLayer.Add(new ResizeAdorner(shape, _mainCanvas));
+                _vm.SelectedCanvasShapes.Add(shape);
+            }
+        }
+
+        private void DeselectAllShapes()
+        {
+            List<Shape> deselectShapes = new();
+
+            foreach (Shape s in _vm.SelectedCanvasShapes)
+            {
+                Adorner[] shapeAdorners = _mainCanvasAdornerLayer.GetAdorners(s);
+
+                if (shapeAdorners != null && shapeAdorners.Length > 0)
+                {
+                    _mainCanvasAdornerLayer.Remove(shapeAdorners[0]);
+                    deselectShapes.Add(s);
+                }
+            }
+
+            foreach (Shape s in deselectShapes)
+            {
+                _vm.SelectedCanvasShapes.Remove(s);
+            }
         }
 
     }
