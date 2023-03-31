@@ -43,13 +43,9 @@ namespace HierarchyTreeAndCanvasWPF.Views
             _mainCanvasAdornerLayer = AdornerLayer.GetAdornerLayer(_mainCanvas);
         }
 
-        private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (e.Source is Shape shape)
-            {
-                SelectShape(shape);
-            }
-            else if (e.Source is Canvas)
+            if (e.Source is Canvas)
             {
                 DeselectAllShapes();
             }
@@ -63,7 +59,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
 
             if (shape != null)
             {
-                SetupDragAndDrop(shape);
+                SetupShapeEventHandlers(shape);
             }
         }
 
@@ -96,7 +92,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
             }
         }
 
-        private void SetupDragAndDrop(Shape shape)
+        private void SetupShapeEventHandlers(Shape shape)
         {
             shape.MouseMove += (s, e) =>
             {
@@ -116,9 +112,28 @@ namespace HierarchyTreeAndCanvasWPF.Views
                     DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
                 }
             };
+
+            shape.MouseLeftButtonUp += (s, e) =>
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Control || Keyboard.Modifiers == ModifierKeys.Shift)
+                {
+                    AddShapeToSelection(shape);
+                }
+                else
+                {
+                    DeselectAllShapes();
+                    AddShapeToSelection(shape);
+                }
+            };
+
+            shape.Drop += (s, e) =>
+            {
+                DeselectAllShapes();
+                AddShapeToSelection(shape);
+            };
         }
 
-        private void SelectShape(Shape shape)
+        private void AddShapeToSelection(Shape shape)
         {
             Adorner[] adorners = _mainCanvasAdornerLayer.GetAdorners(shape);
 
@@ -126,6 +141,8 @@ namespace HierarchyTreeAndCanvasWPF.Views
             {
                 _mainCanvasAdornerLayer.Add(new ResizeAdorner(shape, _mainCanvas));
                 _vm.SelectedCanvasShapes.Add(shape);
+
+                Debug.WriteLine($"selected {shape}");
             }
         }
 
