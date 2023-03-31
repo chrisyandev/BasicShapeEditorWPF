@@ -66,29 +66,45 @@ namespace HierarchyTreeAndCanvasWPF.Views
         private void Canvas_DragOver(object sender, DragEventArgs e)
         {
             Canvas canvas = sender as Canvas;
-            Dictionary<string, object> data = 
-                e.Data.GetData(DataFormats.Serializable) as Dictionary<string, object>;
+            Dictionary<string, object> data = (Dictionary<string, object>)e.Data.GetData(typeof(Dictionary<string, object>));
 
             if (data["shape"] is Shape shape
-                && data["cursorToLeftDistance"] is double cursorToLeftDistance
-                && data["cursorToTopDistance"] is double cursorToTopDistance)
+                && data["prevCursorPoint"] is Point prevCursorPoint)
             {
-                Point cursorPos = e.GetPosition(canvas);
+                Point currCursorPoint = e.GetPosition(canvas);
+                double shapeLeft = Canvas.GetLeft(shape);
+                double shapeTop = Canvas.GetTop(shape);
+                double horizontalChange = currCursorPoint.X - prevCursorPoint.X;
+                double verticalChange = currCursorPoint.Y - prevCursorPoint.Y;
 
-                double newLeft = cursorPos.X - cursorToLeftDistance;
-                double newTop = cursorPos.Y - cursorToTopDistance;
+                double moveX = horizontalChange;
+                double moveY = verticalChange;
 
-                if (newLeft + shape.ActualWidth > canvas.ActualWidth)
+                // canvas left side is limit
+                if (shapeLeft + horizontalChange < 0)
                 {
-                    newLeft = canvas.ActualWidth - shape.ActualWidth;
+                    moveX = 0;
                 }
-                if (newTop + shape.ActualHeight > canvas.ActualHeight)
+                // canvas top side is limit
+                if (shapeTop + verticalChange < 0)
                 {
-                    newTop = canvas.ActualHeight - shape.ActualHeight;
+                    moveY = 0;
+                }
+                // canvas right side is limit
+                if (shapeLeft + shape.ActualWidth + horizontalChange > canvas.ActualWidth)
+                {
+                    moveX = 0;
+                }
+                // canvas bottom side is limit
+                if (shapeTop + shape.ActualHeight + verticalChange > canvas.ActualHeight)
+                {
+                    moveY = 0;
                 }
 
-                Canvas.SetLeft(shape, newLeft < 0 ? 0 : newLeft);
-                Canvas.SetTop(shape, newTop < 0 ? 0 : newTop);
+                MoveSelectedShapes(moveX, moveY);
+
+                data["prevCursorPoint"] = currCursorPoint;
+                e.Data.SetData(data);
             }
         }
 
@@ -96,18 +112,23 @@ namespace HierarchyTreeAndCanvasWPF.Views
         {
             shape.MouseMove += (s, e) =>
             {
-                if (e.LeftButton == MouseButtonState.Pressed)
+                if (e.LeftButton == MouseButtonState.Pressed && Keyboard.Modifiers == ModifierKeys.None)
                 {
                     Debug.WriteLine("drag start");
 
-                    double cursorToLeftDistance = Mouse.GetPosition(_mainCanvas).X - Canvas.GetLeft(shape);
-                    double cursorToTopDistance = Mouse.GetPosition(_mainCanvas).Y - Canvas.GetTop(shape);
+                    // if this shape was not selected before dragging, only drag this shape
+                    if (!_vm.SelectedCanvasShapes.Contains(shape))
+                    {
+                        DeselectAllShapes();
+                        AddShapeToSelection(shape);
+                    }
 
-                    DataObject data = new DataObject(DataFormats.Serializable,
+                    Point cursorStartPoint = Mouse.GetPosition(_mainCanvas);
+
+                    DataObject data = new DataObject(
                         new Dictionary<string, object>() {
-                        { "shape", shape },
-                        { "cursorToLeftDistance", cursorToLeftDistance },
-                        { "cursorToTopDistance", cursorToTopDistance }
+                            { "shape", shape },
+                            { "prevCursorPoint", cursorStartPoint }
                         });
                     DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
                 }
@@ -125,18 +146,22 @@ namespace HierarchyTreeAndCanvasWPF.Views
                     AddShapeToSelection(shape);
                 }
             };
+        }
 
-            shape.Drop += (s, e) =>
+        private void MoveSelectedShapes(double unitsX, double unitsY)
+        {
+            foreach (Shape shape in _vm.SelectedCanvasShapes)
             {
-                DeselectAllShapes();
-                AddShapeToSelection(shape);
-            };
+                Canvas.SetLeft(shape, Canvas.GetLeft(shape) + unitsX);
+                Canvas.SetTop(shape, Canvas.GetTop(shape) + unitsY);
+            }
         }
 
         private void AddShapeToSelection(Shape shape)
         {
             Adorner[] adorners = _mainCanvasAdornerLayer.GetAdorners(shape);
 
+            // we rely on this check to determine if SelectedCanvasShapes already contains shape
             if (adorners == null)
             {
                 _mainCanvasAdornerLayer.Add(new ResizeAdorner(shape, _mainCanvas));
