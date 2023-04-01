@@ -193,7 +193,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
                 Canvas.SetTop(_multiSelectionRect, shapeTop);
 
                 _vm.CanvasShapes.Add(_multiSelectionRect);
-                _mainCanvasAdornerLayer.Add(new MultiResizeAdorner(_multiSelectionRect));
+                _mainCanvasAdornerLayer.Add(new MultiResizeAdorner(_multiSelectionRect, _vm.SelectedCanvasShapes, _mainCanvas));
             }
             else
             {

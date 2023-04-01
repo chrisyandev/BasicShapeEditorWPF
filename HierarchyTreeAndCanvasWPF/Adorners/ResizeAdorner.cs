@@ -17,13 +17,13 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
     public class ResizeAdorner : Adorner
     {
         private static readonly Brush ThumbBrush = Brushes.SlateBlue;
-        private static readonly Brush SelectionRectBrush = Brushes.White;
+        private static readonly Brush VisualRectBrush = Brushes.White;
         private const double ThumbSize = 10;
-        private const double SelectionRectStrokeThickness = 1.5;
+        private const double VisualRectStrokeThickness = 1.5;
 
         private Canvas _canvas;
         private VisualCollection _adornerVisuals;
-        private Rectangle _selectionRect;
+        private Rectangle _visualRect;
         private Thumb _topLeftThumb, _topRightThumb, _bottomLeftThumb, _bottomRightThumb;
 
         public ResizeAdorner(UIElement adornedElement, Canvas canvas) : base(adornedElement)
@@ -32,13 +32,13 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             _adornerVisuals = new VisualCollection(this);
 
             // add this first so it goes below the thumbs
-            _selectionRect = new Rectangle
+            _visualRect = new Rectangle
             {
-                Stroke = SelectionRectBrush,
-                StrokeThickness = SelectionRectStrokeThickness,
+                Stroke = VisualRectBrush,
+                StrokeThickness = VisualRectStrokeThickness,
                 StrokeDashArray = { 2, 2 }
             };
-            _adornerVisuals.Add(_selectionRect);
+            _adornerVisuals.Add(_visualRect);
 
             _topLeftThumb = new Thumb()
             {
@@ -122,16 +122,16 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
         protected override Size ArrangeOverride(Size finalSize)
         {
             // rectangle touches edges of shape
-            _selectionRect.Arrange(new Rect(-SelectionRectStrokeThickness, -SelectionRectStrokeThickness,
-                                    AdornedElement.DesiredSize.Width + SelectionRectStrokeThickness * 2,
-                                    AdornedElement.DesiredSize.Height + SelectionRectStrokeThickness * 2));
+            _visualRect.Arrange(new Rect(-VisualRectStrokeThickness, -VisualRectStrokeThickness,
+                                    AdornedElement.DesiredSize.Width + VisualRectStrokeThickness * 2,
+                                    AdornedElement.DesiredSize.Height + VisualRectStrokeThickness * 2));
 
-            // calculates thumb displacement so selection line goes through middle of thumb
-            double thumbDisplacement = (ThumbSize / 2) + (SelectionRectStrokeThickness / 2);
+            // calculates thumb displacement so visual rect line goes through middle of thumb
+            double thumbDisplacement = (ThumbSize / 2) + (VisualRectStrokeThickness / 2);
 
             // add stroke so thumb displacement is accurate
-            double elementWidth = AdornedElement.DesiredSize.Width + SelectionRectStrokeThickness;
-            double elementHeight = AdornedElement.DesiredSize.Height + SelectionRectStrokeThickness;
+            double elementWidth = AdornedElement.DesiredSize.Width + VisualRectStrokeThickness;
+            double elementHeight = AdornedElement.DesiredSize.Height + VisualRectStrokeThickness;
 
             _topLeftThumb.Arrange(new Rect(-thumbDisplacement, -thumbDisplacement,
                                     ThumbSize, ThumbSize));

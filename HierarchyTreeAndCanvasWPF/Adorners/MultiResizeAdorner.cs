@@ -1,6 +1,7 @@
 ﻿using HierarchyTreeAndCanvasWPF.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,25 +17,31 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
     public class MultiResizeAdorner : Adorner
     {
         private static readonly Brush ThumbBrush = Brushes.SlateBlue;
-        private static readonly Brush SelectionRectBrush = Brushes.White;
+        private static readonly Brush VisualRectBrush = Brushes.White;
         private const double ThumbSize = 20;
-        private const double SelectionRectStrokeThickness = 5;
+        private const double VisualRectStrokeThickness = 5;
 
+        private Rectangle _multiSelectionRect;
+        private IEnumerable<Shape> _selectedShapes;
+        private Canvas _canvas;
         private VisualCollection _adornerVisuals;
-        private Rectangle _selectionRect;
+        private Rectangle _visualRect;
         private Thumb _topLeftThumb, _topRightThumb, _bottomLeftThumb, _bottomRightThumb;
 
-        public MultiResizeAdorner(UIElement adornedElement) : base(adornedElement)
+        public MultiResizeAdorner(UIElement adornedElement, IEnumerable<Shape> selectedShapes, Canvas canvas) : base(adornedElement)
         {
+            _multiSelectionRect = (Rectangle)adornedElement;
+            _selectedShapes = selectedShapes;
+            _canvas = canvas;
             _adornerVisuals = new VisualCollection(this);
 
             // add this first so it goes below the thumbs
-            _selectionRect = new Rectangle
+            _visualRect = new Rectangle
             {
-                Stroke = SelectionRectBrush,
-                StrokeThickness = SelectionRectStrokeThickness
+                Stroke = VisualRectBrush,
+                StrokeThickness = VisualRectStrokeThickness
             };
-            _adornerVisuals.Add(_selectionRect);
+            _adornerVisuals.Add(_visualRect);
 
             _topLeftThumb = new Thumb()
             {
@@ -74,22 +81,50 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
         private void TopLeftThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
+            _multiSelectionRect.ShiftLeftSide(e.HorizontalChange, 0);
+            _multiSelectionRect.ShiftTopSide(e.VerticalChange, 0);
 
+            foreach (Shape shape in _selectedShapes)
+            {
+                shape.ShiftLeftSide(e.HorizontalChange, 0);
+                shape.ShiftTopSide(e.VerticalChange, 0);
+            }
         }
 
         private void TopRightThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
+            _multiSelectionRect.ShiftRightSide(e.HorizontalChange, _canvas.ActualWidth);
+            _multiSelectionRect.ShiftTopSide(e.VerticalChange, 0);
 
+            foreach (Shape shape in _selectedShapes)
+            {
+                shape.ShiftRightSide(e.HorizontalChange, _canvas.ActualWidth);
+                shape.ShiftTopSide(e.VerticalChange, 0);
+            }
         }
 
         private void BottomLeftThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
+            _multiSelectionRect.ShiftLeftSide(e.HorizontalChange, 0);
+            _multiSelectionRect.ShiftBottomSide(e.VerticalChange, _canvas.ActualHeight);
 
+            foreach (Shape shape in _selectedShapes)
+            {
+                shape.ShiftLeftSide(e.HorizontalChange, 0);
+                shape.ShiftBottomSide(e.VerticalChange, _canvas.ActualHeight);
+            }
         }
 
         private void BottomRightThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
+            _multiSelectionRect.ShiftRightSide(e.HorizontalChange, _canvas.ActualWidth);
+            _multiSelectionRect.ShiftBottomSide(e.VerticalChange, _canvas.ActualHeight);
 
+            foreach (Shape shape in _selectedShapes)
+            {
+                shape.ShiftRightSide(e.HorizontalChange, _canvas.ActualWidth);
+                shape.ShiftBottomSide(e.VerticalChange, _canvas.ActualHeight);
+            }
         }
 
         protected override Visual GetVisualChild(int index)
@@ -102,16 +137,16 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
         protected override Size ArrangeOverride(Size finalSize)
         {
             // rectangle touches edges of shape
-            _selectionRect.Arrange(new Rect(-SelectionRectStrokeThickness, -SelectionRectStrokeThickness,
-                                    AdornedElement.DesiredSize.Width + SelectionRectStrokeThickness * 2,
-                                    AdornedElement.DesiredSize.Height + SelectionRectStrokeThickness * 2));
+            _visualRect.Arrange(new Rect(-VisualRectStrokeThickness, -VisualRectStrokeThickness,
+                                    AdornedElement.DesiredSize.Width + VisualRectStrokeThickness * 2,
+                                    AdornedElement.DesiredSize.Height + VisualRectStrokeThickness * 2));
 
-            // calculates thumb displacement so selection line goes through middle of thumb
-            double thumbDisplacement = (ThumbSize / 2) + (SelectionRectStrokeThickness / 2);
+            // calculates thumb displacement so visual rect line goes through middle of thumb
+            double thumbDisplacement = (ThumbSize / 2) + (VisualRectStrokeThickness / 2);
 
             // add stroke so thumb displacement is accurate
-            double elementWidth = AdornedElement.DesiredSize.Width + SelectionRectStrokeThickness;
-            double elementHeight = AdornedElement.DesiredSize.Height + SelectionRectStrokeThickness;
+            double elementWidth = AdornedElement.DesiredSize.Width + VisualRectStrokeThickness;
+            double elementHeight = AdornedElement.DesiredSize.Height + VisualRectStrokeThickness;
 
             _topLeftThumb.Arrange(new Rect(-thumbDisplacement, -thumbDisplacement,
                                     ThumbSize, ThumbSize));
