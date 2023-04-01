@@ -14,74 +14,87 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 {
     public static class ShapeExtensions
     {
-        public static void ShiftLeftSide(this Shape shape, double units, double leftBoundary, uint minWidth = 5)
+        /// <returns>How many units actually shifted</returns>
+        public static double ShiftLeftSide(this Shape shape, double units, double leftBoundary, uint minWidth = 5)
         {
             if (shape is Rectangle rectangle)
             {
-                ShiftLeftSideShapeWithWidthAndHeight(rectangle, units, leftBoundary, minWidth);
+                return ShiftLeftSideShapeWithWidthAndHeight(rectangle, units, leftBoundary, minWidth);
             }
             else if (shape is Ellipse ellipse)
             {
-                ShiftLeftSideShapeWithWidthAndHeight(ellipse, units, leftBoundary, minWidth);
+                return ShiftLeftSideShapeWithWidthAndHeight(ellipse, units, leftBoundary, minWidth);
             }
             else if (shape is Polygon triangle)
             {
-                ShiftLeftSideTriangle(triangle, units, leftBoundary, minWidth);
+                return ShiftLeftSideTriangle(triangle, units, leftBoundary, minWidth);
             }
+
+            return 0;
         }
 
-        public static void ShiftTopSide(this Shape shape, double units, double topBoundary, uint minHeight = 5)
+        /// <returns>How many units actually shifted</returns>
+        public static double ShiftTopSide(this Shape shape, double units, double topBoundary, uint minHeight = 5)
         {
             if (shape is Rectangle rectangle)
             {
-                ShiftTopSideShapeWithWidthAndHeight(rectangle, units, topBoundary, minHeight);
+                return ShiftTopSideShapeWithWidthAndHeight(rectangle, units, topBoundary, minHeight);
             }
             else if (shape is Ellipse ellipse)
             {
-                ShiftTopSideShapeWithWidthAndHeight(ellipse, units, topBoundary, minHeight);
+                return ShiftTopSideShapeWithWidthAndHeight(ellipse, units, topBoundary, minHeight);
             }
             else if (shape is Polygon triangle)
             {
-                ShiftTopSideTriangle(triangle, units, topBoundary, minHeight);
+                return ShiftTopSideTriangle(triangle, units, topBoundary, minHeight);
             }
+
+            return 0;
         }
 
-        public static void ShiftRightSide(this Shape shape, double units, double rightBoundary, uint minWidth = 5)
+        /// <returns>How many units actually shifted</returns>
+        public static double ShiftRightSide(this Shape shape, double units, double rightBoundary, uint minWidth = 5)
         {
             if (shape is Rectangle rectangle)
             {
-                ShiftRightSideShapeWithWidthAndHeight(rectangle, units, rightBoundary, minWidth);
+                return ShiftRightSideShapeWithWidthAndHeight(rectangle, units, rightBoundary, minWidth);
             }
             else if (shape is Ellipse ellipse)
             {
-                ShiftRightSideShapeWithWidthAndHeight(ellipse, units, rightBoundary, minWidth);
+                return ShiftRightSideShapeWithWidthAndHeight(ellipse, units, rightBoundary, minWidth);
             }
             else if (shape is Polygon triangle)
             {
-                ShiftRightSideTriangle(triangle, units, rightBoundary, minWidth);
+                return ShiftRightSideTriangle(triangle, units, rightBoundary, minWidth);
             }
+
+            return 0;
         }
 
-        public static void ShiftBottomSide(this Shape shape, double units, double bottomBoundary, uint minHeight = 5)
+        /// <returns>How many units actually shifted</returns>
+        public static double ShiftBottomSide(this Shape shape, double units, double bottomBoundary, uint minHeight = 5)
         {
             if (shape is Rectangle rectangle)
             {
-                ShiftBottomSideShapeWithWidthAndHeight(rectangle, units, bottomBoundary, minHeight);
+                return ShiftBottomSideShapeWithWidthAndHeight(rectangle, units, bottomBoundary, minHeight);
             }
             else if (shape is Ellipse ellipse)
             {
-                ShiftBottomSideShapeWithWidthAndHeight(ellipse, units, bottomBoundary, minHeight);
+                return ShiftBottomSideShapeWithWidthAndHeight(ellipse, units, bottomBoundary, minHeight);
             }
             else if (shape is Polygon triangle)
             {
-                ShiftBottomSideTriangle(triangle, units, bottomBoundary, minHeight);
+                return ShiftBottomSideTriangle(triangle, units, bottomBoundary, minHeight);
             }
+
+            return 0;
         }
 
-        private static void ShiftLeftSideShapeWithWidthAndHeight(Shape shape, double units, double leftBoundary, uint minWidth)
+        private static double ShiftLeftSideShapeWithWidthAndHeight(Shape shape, double units, double leftBoundary, uint minWidth)
         {
+            double width = shape.Width;
             double left = Canvas.GetLeft(shape);
-            double right = left + shape.Width;
+            double right = left + width;
 
             double newWidth, newLeft;
 
@@ -93,7 +106,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
             else
             {
-                newWidth = shape.Width - units;
+                newWidth = width - units;
                 newLeft = left + units;
             }
 
@@ -107,12 +120,14 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             shape.Width = newWidth;
             Canvas.SetLeft(shape, newLeft);
+            return newWidth - width;
         }
 
-        private static void ShiftTopSideShapeWithWidthAndHeight(Shape shape, double units, double topBoundary, uint minHeight)
+        private static double ShiftTopSideShapeWithWidthAndHeight(Shape shape, double units, double topBoundary, uint minHeight)
         {
+            double height = shape.Height;
             double top = Canvas.GetTop(shape);
-            double bottom = top + shape.Height;
+            double bottom = top + height;
 
             double newHeight, newTop;
 
@@ -124,7 +139,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
             else
             {
-                newHeight = shape.Height - units;
+                newHeight = height - units;
                 newTop = top + units;
             }
 
@@ -138,22 +153,24 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             shape.Height = newHeight;
             Canvas.SetTop(shape, newTop);
+            return newHeight - height;
         }
 
-        private static void ShiftRightSideShapeWithWidthAndHeight(Shape shape, double units, double rightBoundary, uint minWidth)
+        private static double ShiftRightSideShapeWithWidthAndHeight(Shape shape, double units, double rightBoundary, uint minWidth)
         {
+            double width = shape.Width;
             double left = Canvas.GetLeft(shape);
 
             double newWidth;
 
             // shape left side is the limit
-            if (shape.Width + units < minWidth)
+            if (width + units < minWidth)
             {
                 newWidth = minWidth;
             }
             else
             {
-                newWidth = shape.Width + units;
+                newWidth = width + units;
             }
 
             // canvas right side is the limit
@@ -164,22 +181,24 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
 
             shape.Width = newWidth;
+            return newWidth - width;
         }
 
-        private static void ShiftBottomSideShapeWithWidthAndHeight(Shape shape, double units, double bottomBoundary, uint minHeight)
+        private static double ShiftBottomSideShapeWithWidthAndHeight(Shape shape, double units, double bottomBoundary, uint minHeight)
         {
+            double height = shape.Height;
             double top = Canvas.GetTop(shape);
 
             double newHeight;
 
             // shape top side is the limit
-            if (shape.Height + units < minHeight)
+            if (height + units < minHeight)
             {
                 newHeight = minHeight;
             }
             else
             {
-                newHeight = shape.Height + units;
+                newHeight = height + units;
             }
 
             // canvas bottom side is the limit
@@ -190,9 +209,10 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             }
 
             shape.Height = newHeight;
+            return newHeight - height;
         }
 
-        private static void ShiftLeftSideTriangle(Polygon triangle, double units, double leftBoundary, uint minWidth)
+        private static double ShiftLeftSideTriangle(Polygon triangle, double units, double leftBoundary, uint minWidth)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -247,9 +267,11 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             newPoints.Add(newTopPoint);
             newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
+
+            return newWidth - width;
         }
 
-        private static void ShiftTopSideTriangle(Polygon triangle, double units, double topBoundary, uint minHeight)
+        private static double ShiftTopSideTriangle(Polygon triangle, double units, double topBoundary, uint minHeight)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -304,9 +326,11 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             newPoints.Add(newTopPoint);
             newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
+
+            return newHeight - height;
         }
 
-        private static void ShiftRightSideTriangle(Polygon triangle, double units, double rightBoundary, uint minWidth)
+        private static double ShiftRightSideTriangle(Polygon triangle, double units, double rightBoundary, uint minWidth)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -357,9 +381,11 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             newPoints.Add(newTopPoint);
             newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
+
+            return newWidth - width;
         }
 
-        private static void ShiftBottomSideTriangle(Polygon triangle, double units, double bottomBoundary, uint minHeight)
+        private static double ShiftBottomSideTriangle(Polygon triangle, double units, double bottomBoundary, uint minHeight)
         {
             List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
             PointCollection newPoints = new PointCollection();
@@ -410,6 +436,8 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             newPoints.Add(newTopPoint);
             newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
+
+            return newHeight - height;
         }
     }
 }
