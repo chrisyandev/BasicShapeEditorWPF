@@ -1,6 +1,8 @@
 ﻿using HierarchyTreeAndCanvasWPF.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -16,23 +18,30 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 {
     public class MultiResizeAdorner : Adorner
     {
-        private static readonly Brush ThumbBrush = Brushes.SlateBlue;
+        private static readonly Brush ThumbBrush = Brushes.MediumTurquoise;
         private static readonly Brush VisualRectBrush = Brushes.White;
         private const double ThumbSize = 20;
         private const double VisualRectStrokeThickness = 5;
 
-        private Rectangle _multiSelectionRect;
-        private IEnumerable<Shape> _selectedShapes;
+        private ObservableCollection<Shape> _selectedShapes;
         private Canvas _canvas;
+
+        private Rectangle _multiSelectionRect;
+        private double _multiSelectionRectMinHeight;
+        private double _multiSelectionRectMinWidth;
+
         private VisualCollection _adornerVisuals;
         private Rectangle _visualRect;
         private Thumb _topLeftThumb, _topRightThumb, _bottomLeftThumb, _bottomRightThumb;
 
-        public MultiResizeAdorner(UIElement adornedElement, IEnumerable<Shape> selectedShapes, Canvas canvas) : base(adornedElement)
+        public MultiResizeAdorner(UIElement adornedElement, ObservableCollection<Shape> selectedShapes, Canvas canvas) : base(adornedElement)
         {
-            _multiSelectionRect = (Rectangle)adornedElement;
             _selectedShapes = selectedShapes;
+            _selectedShapes.CollectionChanged += SelectedShapes_CollectionChanged;
             _canvas = canvas;
+
+            _multiSelectionRect = (Rectangle)adornedElement;
+            
             _adornerVisuals = new VisualCollection(this);
 
             // add this first so it goes below the thumbs
@@ -77,6 +86,11 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             _adornerVisuals.Add(_topRightThumb);
             _adornerVisuals.Add(_bottomLeftThumb);
             _adornerVisuals.Add(_bottomRightThumb);
+        }
+
+        private void SelectedShapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            
         }
 
         private void TopLeftThumb_DragDelta(object sender, DragDeltaEventArgs e)

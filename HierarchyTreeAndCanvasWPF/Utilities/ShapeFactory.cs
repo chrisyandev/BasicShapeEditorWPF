@@ -22,50 +22,63 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
 
     public static class ShapeFactory
     {
-        public static Shape CreateShape(ShapeType shapeType, double width, double height, Brush fill)
+        public static Shape CreateShape(ShapeType shapeType, double width, double height, Brush fill, double minWidth, double minHeight)
         {
             if (shapeType == ShapeType.Rectangle)
             {
-                return CreateRectangle(width, height, fill);
+                return CreateRectangle(width, height, fill, minWidth, minHeight);
             }
             else if (shapeType == ShapeType.Ellipse)
             {
-                return CreateEllipse(width, height, fill);
+                return CreateEllipse(width, height, fill, minWidth, minHeight);
             }
             else if (shapeType == ShapeType.Triangle)
             {
-                return CreateTriangle(width, height, fill);
+                return CreateTriangle(width, height, fill, minWidth, minHeight);
             }
 
             return null;
         }
 
-        private static Rectangle CreateRectangle(double width, double height, Brush fill)
+        private static Rectangle CreateRectangle(double width, double height, Brush fill, double minWidth, double minHeight)
         {
+            width = width < minWidth ? minWidth : width;
+            height = height < minHeight ? minHeight : height;
+
             Rectangle newRectangle = new Rectangle
             {
                 Width = width,
                 Height = height,
-                Fill = fill
+                Fill = fill,
+                MinWidth = minWidth,
+                MinHeight = minHeight
             };
 
             return newRectangle;
         }
 
-        private static Ellipse CreateEllipse(double width, double height, Brush fill)
+        private static Ellipse CreateEllipse(double width, double height, Brush fill, double minWidth, double minHeight)
         {
+            width = width < minWidth ? minWidth : width;
+            height = height < minHeight ? minHeight : height;
+
             Ellipse newEllipse = new Ellipse
             {
                 Width = width,
                 Height = height,
-                Fill = fill
+                Fill = fill,
+                MinWidth = minWidth,
+                MinHeight = minHeight
             };
 
             return newEllipse;
         }
 
-        private static Polygon CreateTriangle(double width, double height, Brush fill)
+        private static Polygon CreateTriangle(double width, double height, Brush fill, double minWidth, double minHeight)
         {
+            width = width < minWidth ? minWidth : width;
+            height = height < minHeight ? minHeight : height;
+
             Polygon newTriangle = new Polygon
             {
                 Points = new PointCollection
@@ -74,7 +87,9 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
                         new Point(width / 2, 0), // topmost point
                         new Point(width, height) // rightmost point
                     },
-                Fill = fill
+                Fill = fill,
+                MinWidth = minWidth,
+                MinHeight = minHeight
             };
 
             return newTriangle;

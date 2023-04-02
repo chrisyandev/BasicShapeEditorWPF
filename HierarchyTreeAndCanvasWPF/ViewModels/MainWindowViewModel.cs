@@ -33,13 +33,17 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             };
             TreeItems[1].Items.Add(new TreeItem(2, "Circle"));
 
+            CanvasShapes = new ObservableCollection<Shape>();
+            SelectedCanvasShapes = new ObservableCollection<Shape>();
+
             SetShapeToAddCommand = new DoActionWithParameterCommand(shapeName =>
             {
                 ShapeToAdd = shapeName as string;
             });
 
-            CanvasShapes = new ObservableCollection<Shape>();
-            SelectedCanvasShapes = new ObservableCollection<Shape>();
+            // hardcoded for now
+            ShapeMinWidth = 10;
+            ShapeMinHeight = 10;
         }
 
         public ObservableCollection<TreeItem> TreeItems { get; set; }
@@ -61,6 +65,10 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             }
         }
 
+        public double ShapeMinWidth { get; }
+
+        public double ShapeMinHeight { get; }
+
         public ICommand SetShapeToAddCommand { get; }
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -76,60 +84,29 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             if (ShapeToAdd == "rectangle")
             {
                 Rectangle newRectangle = ShapeFactory.CreateShape(
-                    ShapeType.Rectangle, 100, 100, Brushes.Blue) as Rectangle;
-
-                CanvasItem newCanvasItem = new()
-                {
-                    Id = 1,
-                    Shape = newRectangle,
-                    X = mousePosX - (newRectangle.Width / 2),
-                    Y = mousePosY - (newRectangle.Height / 2)
-                };
-
-                Canvas.SetLeft(newRectangle, newCanvasItem.X);
-                Canvas.SetTop(newRectangle, newCanvasItem.Y);
-
+                    ShapeType.Rectangle, 100, 100, Brushes.Blue, ShapeMinWidth, ShapeMinHeight) as Rectangle;
+                Canvas.SetLeft(newRectangle, mousePosX - (newRectangle.Width / 2));
+                Canvas.SetTop(newRectangle, mousePosY - (newRectangle.Height / 2));
                 CanvasShapes.Add(newRectangle);
                 return newRectangle;
             }
             else if (ShapeToAdd == "ellipse")
             {
                 Ellipse newEllipse = ShapeFactory.CreateShape(
-                    ShapeType.Ellipse, 100, 100, Brushes.Red) as Ellipse;
-
-                CanvasItem newCanvasItem = new CanvasItem
-                {
-                    Id = 1,
-                    Shape = newEllipse,
-                    X = mousePosX - (newEllipse.Width / 2),
-                    Y = mousePosY - (newEllipse.Height / 2)
-                };
-
-                Canvas.SetLeft(newEllipse, newCanvasItem.X);
-                Canvas.SetTop(newEllipse, newCanvasItem.Y);
-
+                    ShapeType.Ellipse, 100, 100, Brushes.Red, ShapeMinWidth, ShapeMinHeight) as Ellipse;
+                Canvas.SetLeft(newEllipse, mousePosX - (newEllipse.Width / 2));
+                Canvas.SetTop(newEllipse, mousePosY - (newEllipse.Height / 2));
                 CanvasShapes.Add(newEllipse);
                 return newEllipse;
             }
             else if (ShapeToAdd == "triangle")
             {
                 Polygon newTriangle = ShapeFactory.CreateShape(
-                    ShapeType.Triangle, 100, 100, Brushes.Green) as Polygon;
-
+                    ShapeType.Triangle, 100, 100, Brushes.Green, ShapeMinWidth, ShapeMinHeight) as Polygon;
                 double centroidX = (newTriangle.Points[0].X + newTriangle.Points[1].X + newTriangle.Points[2].X) / 3;
                 double centroidY = (newTriangle.Points[0].Y + newTriangle.Points[1].Y + newTriangle.Points[2].Y) / 3;
-
-                CanvasItem newCanvasItem = new CanvasItem
-                {
-                    Id = 1,
-                    Shape = newTriangle,
-                    X = mousePosX - centroidX,
-                    Y = mousePosY - centroidY
-                };
-
-                Canvas.SetLeft(newTriangle, newCanvasItem.X);
-                Canvas.SetTop(newTriangle, newCanvasItem.Y);
-
+                Canvas.SetLeft(newTriangle, mousePosX - centroidX);
+                Canvas.SetTop(newTriangle, mousePosY - centroidY);
                 CanvasShapes.Add(newTriangle);
                 return newTriangle;
             }
