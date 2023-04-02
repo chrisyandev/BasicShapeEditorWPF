@@ -120,7 +120,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             shape.Width = newWidth;
             Canvas.SetLeft(shape, newLeft);
-            return newWidth - width;
+            return newLeft - left;
         }
 
         private static double ShiftTopSideShapeWithWidthAndHeight(Shape shape, double units, double topBoundary)
@@ -154,7 +154,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
             shape.Height = newHeight;
             Canvas.SetTop(shape, newTop);
-            return newHeight - height;
+            return newTop - top;
         }
 
         private static double ShiftRightSideShapeWithWidthAndHeight(Shape shape, double units, double rightBoundary)
@@ -243,6 +243,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             Point newLeftPoint = leftPoint;
             Point newTopPoint = topPoint;
             Point newRightPoint = rightPoint;
+            double left = Canvas.GetLeft(triangle);
             double width = rightPoint.X - leftPoint.X;
             double minWidth = triangle.MinWidth;
             double newLeft = Canvas.GetLeft(triangle) + units;
@@ -251,7 +252,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             // triangle right side is limit
             if (newWidth < minWidth)
             {
-                newLeft = Canvas.GetLeft(triangle) + width - minWidth;
+                newLeft =  left + width - minWidth;
                 newWidth = minWidth;
             }
 
@@ -272,7 +273,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
 
-            return newWidth - width;
+            return newLeft - left;
         }
 
         private static double ShiftTopSideTriangle(Polygon triangle, double units, double topBoundary)
@@ -303,6 +304,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             Point newLeftPoint = leftPoint;
             Point newTopPoint = topPoint;
             Point newRightPoint = rightPoint;
+            double top = Canvas.GetTop(triangle);
             double height = leftPoint.Y - topPoint.Y;
             double minHeight = triangle.MinHeight;
             double newTop = Canvas.GetTop(triangle) + units;
@@ -311,7 +313,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             // triangle bottom side is limit
             if (newHeight < minHeight)
             {
-                newTop = Canvas.GetTop(triangle) + height - minHeight;
+                newTop = top + height - minHeight;
                 newHeight = minHeight;
             }
 
@@ -332,7 +334,7 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             newPoints.Add(newRightPoint);
             triangle.Points = newPoints;
 
-            return newHeight - height;
+            return newTop - top;
         }
 
         private static double ShiftRightSideTriangle(Polygon triangle, double units, double rightBoundary)

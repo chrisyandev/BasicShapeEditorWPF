@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using HierarchyTreeAndCanvasWPF.Adorners;
 using HierarchyTreeAndCanvasWPF.Extensions;
 using HierarchyTreeAndCanvasWPF.Models;
+using HierarchyTreeAndCanvasWPF.Utilities;
 using HierarchyTreeAndCanvasWPF.ViewModels;
 
 namespace HierarchyTreeAndCanvasWPF.Views
@@ -139,8 +140,21 @@ namespace HierarchyTreeAndCanvasWPF.Views
             {
                 if (Keyboard.Modifiers == ModifierKeys.Control || Keyboard.Modifiers == ModifierKeys.Shift)
                 {
+                    if (_multiSelectionRect == null)
+                    {
+                        _multiSelectionRect = new Rectangle
+                        {
+                            Width = shape.Width,
+                            Height = shape.Height
+                        };
+                        Canvas.SetLeft(_multiSelectionRect, Canvas.GetLeft(shape));
+                        Canvas.SetTop(_multiSelectionRect, Canvas.GetTop(shape));
+
+                        _vm.CanvasShapes.Add(_multiSelectionRect);
+                        _mainCanvasAdornerLayer.Add(new MultiResizeAdorner(_multiSelectionRect, _vm.SelectedCanvasShapes, _mainCanvas));
+                    }
+
                     AddShapeToSelection(shape);
-                    AdjustSelectionBounds(shape);
                 }
                 else
                 {
@@ -173,60 +187,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
             }
         }
 
-        private void AdjustSelectionBounds(Shape addedShape)
-        {
-            double shapeWidth = addedShape.DesiredSize.Width; // use DesiredSize or ActualWidth for Polygon
-            double shapeHeight = addedShape.DesiredSize.Height;
-            double shapeLeft = Canvas.GetLeft(addedShape);
-            double shapeTop = Canvas.GetTop(addedShape);
-            double shapeRight = shapeLeft + shapeWidth;
-            double shapeBottom = shapeTop + shapeHeight;
 
-            if (_multiSelectionRect == null)
-            {
-                _multiSelectionRect = new Rectangle
-                {
-                    Width = shapeWidth,
-                    Height = shapeHeight
-                };
-                Canvas.SetLeft(_multiSelectionRect, shapeLeft);
-                Canvas.SetTop(_multiSelectionRect, shapeTop);
-
-                _vm.CanvasShapes.Add(_multiSelectionRect);
-                _mainCanvasAdornerLayer.Add(new MultiResizeAdorner(_multiSelectionRect, _vm.SelectedCanvasShapes, _mainCanvas));
-            }
-            else
-            {
-                Rect currentBounds = new Rect(
-                    Canvas.GetLeft(_multiSelectionRect), Canvas.GetTop(_multiSelectionRect),
-                    _multiSelectionRect.Width, _multiSelectionRect.Height);
-                Rect newBounds = currentBounds;
-
-                if (shapeLeft < currentBounds.Left)
-                {
-                    newBounds.X = shapeLeft;
-                    newBounds.Width += currentBounds.Left - shapeLeft;
-                }
-                if (shapeTop < currentBounds.Top)
-                {
-                    newBounds.Y = shapeTop;
-                    newBounds.Height += currentBounds.Top - shapeTop;
-                }
-                if (shapeRight > currentBounds.Right)
-                {
-                    newBounds.Width += shapeRight - currentBounds.Right;
-                }
-                if (shapeBottom > currentBounds.Bottom)
-                {
-                    newBounds.Height += shapeBottom - currentBounds.Bottom;
-                }
-
-                Canvas.SetLeft(_multiSelectionRect, newBounds.Left);
-                Canvas.SetTop(_multiSelectionRect, newBounds.Top);
-                _multiSelectionRect.Width = newBounds.Width;
-                _multiSelectionRect.Height = newBounds.Height;
-            }
-        }
 
         private void DeselectAllShapes()
         {
