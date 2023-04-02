@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -10,9 +11,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HierarchyTreeAndCanvasWPF.Adorners;
 using HierarchyTreeAndCanvasWPF.Extensions;
@@ -114,7 +112,8 @@ namespace HierarchyTreeAndCanvasWPF.Views
         {
             shape.MouseMove += (s, e) =>
             {
-                if (e.LeftButton == MouseButtonState.Pressed && Keyboard.Modifiers == ModifierKeys.None)
+                if (e.LeftButton == MouseButtonState.Pressed
+                    && Keyboard.Modifiers == ModifierKeys.None)
                 {
                     Debug.WriteLine("drag start");
 
@@ -138,22 +137,9 @@ namespace HierarchyTreeAndCanvasWPF.Views
 
             shape.MouseLeftButtonUp += (s, e) =>
             {
-                if (Keyboard.Modifiers == ModifierKeys.Control || Keyboard.Modifiers == ModifierKeys.Shift)
+                if (Keyboard.Modifiers == ModifierKeys.Control
+                    || Keyboard.Modifiers == ModifierKeys.Shift)
                 {
-                    if (_multiSelectionRect == null)
-                    {
-                        _multiSelectionRect = new Rectangle
-                        {
-                            Width = shape.Width,
-                            Height = shape.Height
-                        };
-                        Canvas.SetLeft(_multiSelectionRect, Canvas.GetLeft(shape));
-                        Canvas.SetTop(_multiSelectionRect, Canvas.GetTop(shape));
-
-                        _vm.CanvasShapes.Add(_multiSelectionRect);
-                        _mainCanvasAdornerLayer.Add(new MultiResizeAdorner(_multiSelectionRect, _vm.SelectedCanvasShapes, _mainCanvas));
-                    }
-
                     AddShapeToSelection(shape);
                 }
                 else
@@ -175,40 +161,65 @@ namespace HierarchyTreeAndCanvasWPF.Views
 
         private void AddShapeToSelection(Shape shape)
         {
-            Adorner[] adorners = _mainCanvasAdornerLayer.GetAdorners(shape);
-
-            // we rely on this check to determine if SelectedCanvasShapes already contains shape
-            if (adorners == null)
+            // if null, adorner layer's adorners is also null, meaning nothing is selected
+            if (_multiSelectionRect == null)
             {
-                _mainCanvasAdornerLayer.Add(new ResizeAdorner(shape, _mainCanvas));
-                _vm.SelectedCanvasShapes.Add(shape);
-
-                Debug.WriteLine($"selected {shape}");
+                _mainCanvasAdornerLayer.Add(CreateMultiResizeAdorner(
+                    ref _multiSelectionRect, _vm.CanvasShapes,
+                    _vm.SelectedCanvasShapes, _mainCanvas, shape));
             }
+            _vm.SelectedCanvasShapes.Add(shape);
         }
-
-
 
         private void DeselectAllShapes()
         {
-            List<Shape> deselectShapes = new();
-
-            foreach (Shape s in _vm.SelectedCanvasShapes)
+            // if not null, something is selected
+            if (_multiSelectionRect != null)
             {
-                Adorner[] shapeAdorners = _mainCanvasAdornerLayer.GetAdorners(s);
-
-                if (shapeAdorners != null && shapeAdorners.Length > 0)
-                {
-                    _mainCanvasAdornerLayer.Remove(shapeAdorners[0]);
-                    deselectShapes.Add(s);
-                }
-            }
-
-            foreach (Shape s in deselectShapes)
-            {
-                _vm.SelectedCanvasShapes.Remove(s);
+                RemoveMultiResizeAdorner(ref _multiSelectionRect,
+                    _mainCanvasAdornerLayer, _vm.CanvasShapes);
+                _vm.SelectedCanvasShapes.Clear(); // clear only after disposing MultiResizeAdorner
             }
         }
 
+        private MultiResizeAdorner CreateMultiResizeAdorner(
+            ref Rectangle multiSelectionRect,
+            ObservableCollection<Shape> canvasShapes,
+            ObservableCollection<Shape> selectedCanvasShapes,
+            Canvas canvas,
+            Shape basedOnShape)
+        {
+            multiSelectionRect = new Rectangle
+            {
+                Width = basedOnShape.DesiredSize.Width,
+                Height = basedOnShape.DesiredSize.Height
+            };
+            Canvas.SetLeft(multiSelectionRect, Canvas.GetLeft(basedOnShape));
+            Canvas.SetTop(multiSelectionRect, Canvas.GetTop(basedOnShape));
+
+            canvasShapes.Add(multiSelectionRect); // important
+
+            return new MultiResizeAdorner(multiSelectionRect, selectedCanvasShapes, canvas);
+        }
+
+        private void RemoveMultiResizeAdorner(
+            ref Rectangle multiSelectionRect,
+            AdornerLayer adornerLayer,
+            ObservableCollection<Shape> canvasShapes)
+        {
+            Adorner[] adorners = adornerLayer.GetAdorners(multiSelectionRect);
+
+            foreach (Adorner adorner in adorners)
+            {
+                if (adorner is MultiResizeAdorner mra)
+                {
+                    mra.Dispose();
+                    adornerLayer.Remove(mra);
+                    canvasShapes.Remove(multiSelectionRect);
+                    multiSelectionRect = null;
+                    break;
+                }
+            }
+        }
     }
 }

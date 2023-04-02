@@ -16,12 +16,12 @@ using System.Windows.Shapes;
 
 namespace HierarchyTreeAndCanvasWPF.Adorners
 {
-    public class MultiResizeAdorner : Adorner
+    public class MultiResizeAdorner : Adorner, IDisposable
     {
-        private static readonly Brush ThumbBrush = Brushes.MediumTurquoise;
+        private static readonly Brush ThumbBrush = Brushes.SlateBlue;
         private static readonly Brush VisualRectBrush = Brushes.White;
-        private const double ThumbSize = 20;
-        private const double VisualRectStrokeThickness = 5;
+        private const double ThumbSize = 10;
+        private const double VisualRectStrokeThickness = 1.5;
 
         private ObservableCollection<Shape> _selectedShapes;
         private Canvas _canvas;
@@ -46,7 +46,8 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             _visualRect = new Rectangle
             {
                 Stroke = VisualRectBrush,
-                StrokeThickness = VisualRectStrokeThickness
+                StrokeThickness = VisualRectStrokeThickness,
+                StrokeDashArray = { 2, 2 }
             };
             _adornerVisuals.Add(_visualRect);
 
@@ -132,13 +133,13 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
             foreach (Shape shape in selectedShapes)
             {
-                if (shape.Width - shape.MinWidth < smallestPossibleShiftX)
+                if (shape.DesiredSize.Width - shape.MinWidth < smallestPossibleShiftX)
                 {
-                    smallestPossibleShiftX = shape.Width - shape.MinWidth;
+                    smallestPossibleShiftX = shape.DesiredSize.Width - shape.MinWidth;
                 }
-                if (shape.Height - shape.MinHeight < smallestPossibleShiftY)
+                if (shape.DesiredSize.Height - shape.MinHeight < smallestPossibleShiftY)
                 {
-                    smallestPossibleShiftY = shape.Height - shape.MinHeight;
+                    smallestPossibleShiftY = shape.DesiredSize.Height - shape.MinHeight;
                 }
             }
 
@@ -148,8 +149,6 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
         private void SelectedShapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Debug.WriteLine("SelectedShapes_CollectionChanged");
-
             AdjustMultiSelectionRect(_multiSelectionRect, (Shape)e.NewItems[0]);
             CalculateMultiSelectionRectMinSize(_multiSelectionRect, _selectedShapes);
         }
@@ -236,6 +235,11 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
                                         ThumbSize, ThumbSize));
 
             return base.ArrangeOverride(finalSize);
+        }
+
+        public void Dispose()
+        {
+            _selectedShapes.CollectionChanged -= SelectedShapes_CollectionChanged;
         }
     }
 }
