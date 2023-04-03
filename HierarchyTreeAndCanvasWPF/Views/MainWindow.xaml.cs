@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Shapes;
 using HierarchyTreeAndCanvasWPF.Adorners;
 using HierarchyTreeAndCanvasWPF.Extensions;
@@ -55,7 +56,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
         {
             Canvas canvas = sender as Canvas;
 
-            Shape shape = _vm.AddShape(canvas);
+            Shape shape = _vm.AddShapeToCanvas(canvas);
 
             if (shape != null)
             {
@@ -110,48 +111,60 @@ namespace HierarchyTreeAndCanvasWPF.Views
 
         private void SetupShapeEventHandlers(Shape shape)
         {
-            shape.MouseMove += (s, e) =>
+            shape.MouseLeftButtonUp += Shape_MouseLeftButtonUp;
+            shape.MouseMove += Shape_MouseMove;
+        }
+
+        private void Shape_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Shape shape = sender as Shape;
+
+            Debug.WriteLine($"clicked {shape}");
+
+            if (Keyboard.Modifiers == ModifierKeys.Control
+                || Keyboard.Modifiers == ModifierKeys.Shift)
             {
-                if (e.LeftButton == MouseButtonState.Pressed
-                    && Keyboard.Modifiers == ModifierKeys.None)
-                {
-                    Debug.WriteLine("drag start");
-
-                    // if this shape was not selected before dragging, only drag this shape
-                    if (!_vm.SelectedCanvasShapes.Contains(shape))
-                    {
-                        DeselectAllShapes();
-                        AddShapeToSelection(shape);
-                    }
-
-                    Point cursorStartPoint = Mouse.GetPosition(_mainCanvas);
-
-                    DataObject data = new DataObject(
-                        new Dictionary<string, object>() {
-                            { "shape", shape },
-                            { "prevCursorPoint", cursorStartPoint }
-                        });
-                    DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
-                }
-            };
-
-            shape.MouseLeftButtonUp += (s, e) =>
+                AddShapeToSelection(shape);
+            }
+            else
             {
-                if (Keyboard.Modifiers == ModifierKeys.Control
-                    || Keyboard.Modifiers == ModifierKeys.Shift)
-                {
-                    AddShapeToSelection(shape);
-                }
-                else
+                DeselectAllShapes();
+                AddShapeToSelection(shape);
+            }
+        }
+
+        private void Shape_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed
+                && Keyboard.Modifiers == ModifierKeys.None)
+            {
+                Debug.WriteLine("drag start");
+
+                Shape shape = sender as Shape;
+
+                // if this shape was not selected before dragging, only drag this shape
+                if (shape != _multiSelectionRect && !_vm.SelectedCanvasShapes.Contains(shape))
                 {
                     DeselectAllShapes();
                     AddShapeToSelection(shape);
                 }
-            };
-        }
+
+                Point cursorStartPoint = Mouse.GetPosition(_mainCanvas);
+
+                DataObject data = new DataObject(
+                    new Dictionary<string, object>() {
+                            { "shape", shape },
+                            { "prevCursorPoint", cursorStartPoint }
+                    });
+                DragDrop.DoDragDrop(shape, data, DragDropEffects.Move);
+            }
+        } 
 
         private void MoveSelectedShapes(double unitsX, double unitsY)
         {
+            Canvas.SetLeft(_multiSelectionRect, Canvas.GetLeft(_multiSelectionRect) + unitsX);
+            Canvas.SetTop(_multiSelectionRect, Canvas.GetTop(_multiSelectionRect) + unitsY);
+
             foreach (Shape shape in _vm.SelectedCanvasShapes)
             {
                 Canvas.SetLeft(shape, Canvas.GetLeft(shape) + unitsX);
@@ -161,6 +174,8 @@ namespace HierarchyTreeAndCanvasWPF.Views
 
         private void AddShapeToSelection(Shape shape)
         {
+            Debug.WriteLine($"selected {shape}");
+
             // if null, adorner layer's adorners is also null, meaning nothing is selected
             if (_multiSelectionRect == null)
             {
@@ -192,12 +207,14 @@ namespace HierarchyTreeAndCanvasWPF.Views
             multiSelectionRect = new Rectangle
             {
                 Width = basedOnShape.DesiredSize.Width,
-                Height = basedOnShape.DesiredSize.Height
+                Height = basedOnShape.DesiredSize.Height,
+                Fill = Brushes.Transparent
             };
             Canvas.SetLeft(multiSelectionRect, Canvas.GetLeft(basedOnShape));
             Canvas.SetTop(multiSelectionRect, Canvas.GetTop(basedOnShape));
 
-            canvasShapes.Add(multiSelectionRect); // important
+            multiSelectionRect.MouseMove += Shape_MouseMove;
+            canvasShapes.Insert(0, multiSelectionRect); // important, so selection rect will be at the bottom
 
             return new MultiResizeAdorner(multiSelectionRect, selectedCanvasShapes, canvas);
         }

@@ -76,7 +76,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public Shape AddShape(Canvas canvas)
+        public Shape AddShapeToCanvas(Canvas canvas)
         {
             double mousePosX = Mouse.GetPosition(canvas).X;
             double mousePosY = Mouse.GetPosition(canvas).Y;
