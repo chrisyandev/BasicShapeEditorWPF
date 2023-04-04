@@ -18,7 +18,7 @@ using HierarchyTreeAndCanvasWPF.Utilities;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged, ICanvasViewModel
     {
         private string _shapeToAdd;
 
@@ -76,12 +76,12 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public Shape AddShapeToCanvas(Canvas canvas)
+        public Shape AddShapeToCanvas(string shapeName, Canvas canvas)
         {
             double mousePosX = Mouse.GetPosition(canvas).X;
             double mousePosY = Mouse.GetPosition(canvas).Y;
 
-            if (ShapeToAdd == "rectangle")
+            if (shapeName == "rectangle")
             {
                 Rectangle newRectangle = ShapeFactory.CreateShape(
                     ShapeType.Rectangle, 100, 100, Brushes.Blue, ShapeMinWidth, ShapeMinHeight) as Rectangle;
@@ -90,7 +90,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 CanvasShapes.Add(newRectangle);
                 return newRectangle;
             }
-            else if (ShapeToAdd == "ellipse")
+            else if (shapeName == "ellipse")
             {
                 Ellipse newEllipse = ShapeFactory.CreateShape(
                     ShapeType.Ellipse, 100, 100, Brushes.Red, ShapeMinWidth, ShapeMinHeight) as Ellipse;
@@ -99,7 +99,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 CanvasShapes.Add(newEllipse);
                 return newEllipse;
             }
-            else if (ShapeToAdd == "triangle")
+            else if (shapeName == "triangle")
             {
                 Polygon newTriangle = ShapeFactory.CreateShape(
                     ShapeType.Triangle, 100, 100, Brushes.Green, ShapeMinWidth, ShapeMinHeight) as Polygon;
