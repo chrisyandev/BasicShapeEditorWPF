@@ -9,7 +9,7 @@ using System.Windows.Shapes;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
-    public interface ICanvasViewModel
+    public interface IShapeCanvasViewModel
     {
         public ObservableCollection<Shape> CanvasShapes { get; set; }
         public ObservableCollection<Shape> SelectedCanvasShapes { get; set; }

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HierarchyTreeAndCanvasWPF.Views"
         xmlns:vm="clr-namespace:HierarchyTreeAndCanvasWPF.ViewModels"
+        xmlns:controls="clr-namespace:HierarchyTreeAndCanvasWPF.Controls"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
@@ -27,14 +28,8 @@
                       ItemsSource="{Binding CanvasShapes}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Initialized="Canvas_Initialized"
-                            Background="Orange"
-                            AllowDrop="True"
-                            DragOver="Canvas_DragOver"
-                            MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
-                            MouseRightButtonUp="Canvas_MouseRightButtonUp"
-                            MouseRightButtonDown="Canvas_MouseRightButtonDown"
-                            MouseMove="Canvas_MouseMove"/>
+                    <controls:ShapeCanvas Background="Orange"
+                                          AllowDrop="True"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>

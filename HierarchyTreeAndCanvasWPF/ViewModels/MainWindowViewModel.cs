@@ -18,7 +18,7 @@ using HierarchyTreeAndCanvasWPF.Utilities;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged, ICanvasViewModel
+    public class MainWindowViewModel : INotifyPropertyChanged, IShapeCanvasViewModel
     {
         private string _shapeToAdd;
 

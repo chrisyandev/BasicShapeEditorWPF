@@ -11,20 +11,21 @@ using System.Windows.Input;
 using HierarchyTreeAndCanvasWPF.Extensions;
 using System.Diagnostics;
 using HierarchyTreeAndCanvasWPF.ViewModels;
+using HierarchyTreeAndCanvasWPF.Controls;
 
 namespace HierarchyTreeAndCanvasWPF.Utilities
 {
     public class RubberbandRectangle
     {
         private Point _initPos;
-        private Canvas _canvas;
-        private ICanvasViewModel _vm;
+        private ShapeCanvas _canvas;
+        private IShapeCanvasViewModel _vm;
         private Rectangle _visualRect;
 
-        public RubberbandRectangle(Canvas canvas)
+        public RubberbandRectangle(ShapeCanvas canvas)
         {
             _canvas = canvas;
-            _vm = canvas.DataContext as ICanvasViewModel;
+            _vm = canvas.DataContext as IShapeCanvasViewModel;
 
             _initPos = Mouse.GetPosition(_canvas);
 
@@ -74,22 +75,32 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
         
         public void SelectShapesWithin()
         {
-            Rect selectingRect = new Rect(Canvas.GetLeft(_visualRect), Canvas.GetTop(_visualRect),
+            Debug.WriteLine("SelectShapesWithin");
+
+            Rect selectingRect = new(Canvas.GetLeft(_visualRect), Canvas.GetTop(_visualRect),
                 _visualRect.Width, _visualRect.Height);
+            
+            List<Shape> shapesToAdd = new();
+
             foreach (Shape shape in _vm.CanvasShapes)
             {
                 if (shape == _visualRect)
                 {
-                    return;
+                    continue;
                 }
 
-                Rect shapeRect = new Rect(Canvas.GetLeft(shape), Canvas.GetTop(shape),
+                Rect shapeRect = new(Canvas.GetLeft(shape), Canvas.GetTop(shape),
                     shape.DesiredSize.Width, shape.DesiredSize.Height);
 
                 if (selectingRect.Contains(shapeRect))
                 {
-                    _vm.SelectedCanvasShapes.Add(shape);
+                    shapesToAdd.Add(shape);
                 }
+            }
+
+            foreach (Shape shape in shapesToAdd)
+            {
+                _canvas.AddShapeToSelection(shape);
             }
         }
     }

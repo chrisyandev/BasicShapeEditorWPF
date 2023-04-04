@@ -149,8 +149,11 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
         private void SelectedShapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            AdjustMultiSelectionRect(_multiSelectionRect, (Shape)e.NewItems[0]);
-            CalculateMultiSelectionRectMinSize(_multiSelectionRect, _selectedShapes);
+            if (e.NewItems != null)
+            {
+                AdjustMultiSelectionRect(_multiSelectionRect, (Shape)e.NewItems[0]);
+                CalculateMultiSelectionRectMinSize(_multiSelectionRect, _selectedShapes);
+            }
         }
 
         private void TopLeftThumb_DragDelta(object sender, DragDeltaEventArgs e)
