@@ -71,6 +71,9 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
             {
                 _visualRect.ShiftBottomSide(newHeight - _visualRect.Height, _canvas.ActualHeight);
             }
+
+/*            Debug.WriteLine($"visualRect Width {_visualRect.Width} Height {_visualRect.Height}");
+            Debug.WriteLine($"visualRect Left {Canvas.GetLeft(_visualRect)} Top {Canvas.GetTop(_visualRect)}");*/
         }
         
         public void SelectShapesWithin()

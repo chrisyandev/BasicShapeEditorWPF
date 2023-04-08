@@ -61,8 +61,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 _vm.CanvasShapes.Remove(_rubberbandRect.GetRectangle());
                 _rubberbandRect = null;
             }
-
-            if (e.Source is Canvas)
+            else if (e.Source is Canvas)
             {
                 DeselectAllShapes();
             }
@@ -216,7 +215,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public void AddShapeToSelection(Shape shape)
         {
-            Debug.WriteLine($"selected {shape}");
+            Debug.WriteLine($"AddShapeToSelection");
 
             // if null, adorner layer's adorners is also null, meaning nothing is selected
             if (_multiSelectionRect == null)
@@ -226,16 +225,20 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                     _vm.SelectedCanvasShapes, this, shape));
             }
             _vm.SelectedCanvasShapes.Add(shape);
+            Debug.WriteLine($"selected {shape}");
         }
 
         public void DeselectAllShapes()
         {
+            Debug.WriteLine($"DeselectAllShapes");
+
             // if not null, something is selected
             if (_multiSelectionRect != null)
             {
                 RemoveMultiResizeAdorner(ref _multiSelectionRect,
                     _shapeCanvasAdornerLayer, _vm.CanvasShapes);
                 _vm.SelectedCanvasShapes.Clear(); // clear only after disposing MultiResizeAdorner
+                Debug.WriteLine($"cleared all selected shapes");
             }
         }
 
@@ -246,6 +249,8 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             Canvas canvas,
             Shape basedOnShape)
         {
+            Debug.WriteLine($"CreateMultiResizeAdorner");
+
             multiSelectionRect = new Rectangle
             {
                 Width = basedOnShape.DesiredSize.Width,
@@ -266,6 +271,8 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             AdornerLayer adornerLayer,
             ObservableCollection<Shape> canvasShapes)
         {
+            Debug.WriteLine($"RemoveMultiResizeAdorner");
+
             Adorner[] adorners = adornerLayer.GetAdorners(multiSelectionRect);
 
             foreach (Adorner adorner in adorners)
