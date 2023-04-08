@@ -56,6 +56,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             if (_isDraggingRubberbandRect)
             {
                 _isDraggingRubberbandRect = false;
+                Mouse.Capture(null);
                 DeselectAllShapes();
                 _rubberbandRect.SelectShapesWithin();
                 _vm.CanvasShapes.Remove(_rubberbandRect.GetRectangle());
@@ -91,6 +92,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                     _vm.CanvasShapes.Add(_rubberbandRect.GetRectangle());
                 }
 
+                Mouse.Capture(this);
                 _rubberbandRect.Update();
             }
         }
