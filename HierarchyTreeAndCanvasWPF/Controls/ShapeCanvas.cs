@@ -111,8 +111,10 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 && data["prevCursorPoint"] is Point prevCursorPoint)
             {
                 Point currCursorPoint = e.GetPosition(canvas);
-                double shapeLeft = Canvas.GetLeft(shape);
-                double shapeTop = Canvas.GetTop(shape);
+                double selectionLeft = Canvas.GetLeft(_multiSelectionRect);
+                double selectionTop = Canvas.GetTop(_multiSelectionRect);
+                double selectionRight = selectionLeft + _multiSelectionRect.Width;
+                double selectionBottom = selectionTop + _multiSelectionRect.Height;
                 double horizontalChange = currCursorPoint.X - prevCursorPoint.X;
                 double verticalChange = currCursorPoint.Y - prevCursorPoint.Y;
 
@@ -120,22 +122,22 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 double moveY = verticalChange;
 
                 // canvas left side is limit
-                if (shapeLeft + horizontalChange < 0)
+                if (selectionLeft + horizontalChange < 0)
                 {
                     moveX = 0;
                 }
                 // canvas top side is limit
-                if (shapeTop + verticalChange < 0)
+                if (selectionTop + verticalChange < 0)
                 {
                     moveY = 0;
                 }
                 // canvas right side is limit
-                if (shapeLeft + shape.ActualWidth + horizontalChange > canvas.ActualWidth)
+                if (selectionRight + horizontalChange > canvas.ActualWidth)
                 {
                     moveX = 0;
                 }
                 // canvas bottom side is limit
-                if (shapeTop + shape.ActualHeight + verticalChange > canvas.ActualHeight)
+                if (selectionBottom + verticalChange > canvas.ActualHeight)
                 {
                     moveY = 0;
                 }
