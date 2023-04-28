@@ -13,7 +13,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
     {
         public ObservableCollection<Shape> CanvasShapes { get; set; }
         public ObservableCollection<Shape> SelectedCanvasShapes { get; set; }
-        public string ShapeToAdd { get; }
+        public string ActiveTool { get; }
         public Shape AddShapeToCanvas(string shapeName, Canvas canvas);
     }
 }

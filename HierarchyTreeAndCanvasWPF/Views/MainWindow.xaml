@@ -53,12 +53,12 @@
             </Grid.Resources>
             <Button Grid.Column="0"
                     Content="Rectangle"
-                    Command="{Binding SetShapeToAddCommand}"
+                    Command="{Binding SetActiveToolCommand}"
                     CommandParameter="rectangle">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShapeToAdd}" Value="rectangle">
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="rectangle">
                                 <Setter Property="Background" Value="{StaticResource ActiveButtonBackgroundBrush}"/>
                                 <Setter Property="Foreground" Value="{StaticResource ActiveButtonForegroundBrush}"/>
                             </DataTrigger>
@@ -68,12 +68,12 @@
             </Button>
             <Button Grid.Column="1"
                     Content="Ellipse"
-                    Command="{Binding SetShapeToAddCommand}"
+                    Command="{Binding SetActiveToolCommand}"
                     CommandParameter="ellipse">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShapeToAdd}" Value="ellipse">
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="ellipse">
                                 <Setter Property="Background" Value="{StaticResource ActiveButtonBackgroundBrush}"/>
                                 <Setter Property="Foreground" Value="{StaticResource ActiveButtonForegroundBrush}"/>
                             </DataTrigger>
@@ -83,12 +83,12 @@
             </Button>
             <Button Grid.Column="2"
                     Content="Triangle"
-                    Command="{Binding SetShapeToAddCommand}"
+                    Command="{Binding SetActiveToolCommand}"
                     CommandParameter="triangle">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShapeToAdd}" Value="triangle">
+                            <DataTrigger Binding="{Binding ActiveTool}" Value="triangle">
                                 <Setter Property="Background" Value="{StaticResource ActiveButtonBackgroundBrush}"/>
                                 <Setter Property="Foreground" Value="{StaticResource ActiveButtonForegroundBrush}"/>
                             </DataTrigger>

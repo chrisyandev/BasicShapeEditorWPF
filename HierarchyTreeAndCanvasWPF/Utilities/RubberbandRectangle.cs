@@ -19,20 +19,22 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
     {
         private Point _initPos;
         private ShapeCanvas _canvas;
+        private Shape _shapePreview;
         private IShapeCanvasViewModel _vm;
         private Rectangle _visualRect;
 
-        public RubberbandRectangle(ShapeCanvas canvas)
+        public RubberbandRectangle(ShapeCanvas canvas, Shape shapePreview = null)
         {
             _canvas = canvas;
+            _shapePreview = shapePreview;
             _vm = canvas.DataContext as IShapeCanvasViewModel;
 
             _initPos = Mouse.GetPosition(_canvas);
 
             _visualRect = new Rectangle
             {
-                Width = 5,
-                Height = 5,
+                Width = 0,
+                Height = 0,
                 MinWidth = 0,
                 MinHeight = 0,
                 Fill = Brushes.Black,
@@ -56,32 +58,48 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
 
             if (newPos.X < _initPos.X)
             {
-                _visualRect.ShiftLeftSide(_visualRect.Width - newWidth, 0);
+                _visualRect.ShiftLeftSide(_visualRect.DesiredSize.Width - newWidth, 0);
+                if (_shapePreview != null)
+                {
+                    _shapePreview.ShiftLeftSide(_shapePreview.DesiredSize.Width - newWidth, 0);
+                }
             }
             else if (newPos.X > _initPos.X)
             {
-                _visualRect.ShiftRightSide(newWidth - _visualRect.Width, _canvas.ActualWidth);
+                _visualRect.ShiftRightSide(newWidth - _visualRect.DesiredSize.Width, _canvas.ActualWidth);
+                if (_shapePreview != null)
+                {
+                    _shapePreview.ShiftRightSide(newWidth - _shapePreview.DesiredSize.Width, _canvas.ActualWidth);
+                }
             }
 
             if (newPos.Y < _initPos.Y)
             {
-                _visualRect.ShiftTopSide(_visualRect.Height - newHeight, 0);
+                _visualRect.ShiftTopSide(_visualRect.DesiredSize.Height - newHeight, 0);
+                if (_shapePreview != null)
+                {
+                    _shapePreview.ShiftTopSide(_shapePreview.DesiredSize.Height - newHeight, 0);
+                }
             }
             else if (newPos.Y > _initPos.Y)
             {
-                _visualRect.ShiftBottomSide(newHeight - _visualRect.Height, _canvas.ActualHeight);
+                _visualRect.ShiftBottomSide(newHeight - _visualRect.DesiredSize.Height, _canvas.ActualHeight);
+                if (_shapePreview != null)
+                {
+                    _shapePreview.ShiftBottomSide(newHeight - _shapePreview.DesiredSize.Height, _canvas.ActualHeight);
+                }
             }
 
-/*            Debug.WriteLine($"visualRect Width {_visualRect.Width} Height {_visualRect.Height}");
-            Debug.WriteLine($"visualRect Left {Canvas.GetLeft(_visualRect)} Top {Canvas.GetTop(_visualRect)}");*/
+            /*            Debug.WriteLine($"visualRect Width {_visualRect.DesiredSize.Width} Height {_visualRect.DesiredSize.Height}");
+                        Debug.WriteLine($"visualRect Left {Canvas.GetLeft(_visualRect)} Top {Canvas.GetTop(_visualRect)}");*/
         }
-        
+
         public void SelectShapesWithin()
         {
             Debug.WriteLine("SelectShapesWithin");
 
             Rect selectingRect = new(Canvas.GetLeft(_visualRect), Canvas.GetTop(_visualRect),
-                _visualRect.Width, _visualRect.Height);
+                _visualRect.DesiredSize.Width, _visualRect.DesiredSize.Height);
             
             List<Shape> shapesToAdd = new();
 

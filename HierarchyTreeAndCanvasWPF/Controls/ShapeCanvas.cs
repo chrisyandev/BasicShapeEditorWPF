@@ -70,14 +70,14 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Canvas canvas = sender as Canvas;
+/*            Canvas canvas = sender as Canvas;
 
-            Shape shape = _vm.AddShapeToCanvas(_vm.ShapeToAdd, canvas);
+            Shape shape = _vm.AddShapeToCanvas(_vm.ActiveTool, canvas);
 
             if (shape != null)
             {
                 SetupShapeEventHandlers(shape);
-            }
+            }*/
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -88,7 +88,22 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
                 if (_rubberbandRect == null)
                 {
-                    _rubberbandRect = new RubberbandRectangle(this);
+                    if (_vm.ActiveTool == "rectangle" || _vm.ActiveTool == "ellipse" || _vm.ActiveTool == "triangle")
+                    {
+                        Shape shape = _vm.AddShapeToCanvas(_vm.ActiveTool, this);
+
+                        if (shape != null)
+                        {
+                            SetupShapeEventHandlers(shape);
+                        }
+
+                        _rubberbandRect = new RubberbandRectangle(this, shape);
+                    }
+                    else
+                    {
+                        _rubberbandRect = new RubberbandRectangle(this);
+                    }
+
                     _vm.CanvasShapes.Add(_rubberbandRect.GetRectangle());
                 }
 
