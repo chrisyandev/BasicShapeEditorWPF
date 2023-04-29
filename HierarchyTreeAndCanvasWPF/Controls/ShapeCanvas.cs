@@ -26,7 +26,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         private Rectangle _multiSelectionRect;
         private IShapeCanvasViewModel _vm;
         RubberbandRectangle _rubberbandRect;
-        private bool _isDraggingRubberbandRect = false;
 
         static ShapeCanvas()
         {
@@ -57,13 +56,12 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_isDraggingRubberbandRect)
+            // not null means rubberband rectangle is being dragged
+            if (_rubberbandRect != null)
             {
-                _isDraggingRubberbandRect = false;
                 Mouse.Capture(null);
                 DeselectAllShapes();
                 _rubberbandRect.DragStop();
-                _vm.CanvasShapes.Remove(_rubberbandRect.GetRectangle());
                 _rubberbandRect = null;
             }
             else if (e.Source is Canvas)
@@ -74,14 +72,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-/*            Canvas canvas = sender as Canvas;
 
-            Shape shape = _vm.AddShapeToCanvas(_vm.ActiveTool, canvas);
-
-            if (shape != null)
-            {
-                SetupShapeEventHandlers(shape);
-            }*/
         }
 
         private void Canvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -93,8 +84,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                _isDraggingRubberbandRect = true;
-
                 if (_rubberbandRect == null)
                 {
                     if (_vm.ActiveTool == "rectangle" || _vm.ActiveTool == "ellipse" || _vm.ActiveTool == "triangle")
@@ -112,8 +101,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                     {
                         _rubberbandRect = new RubberbandRectangle(this);
                     }
-
-                    _vm.CanvasShapes.Add(_rubberbandRect.GetRectangle());
                 }
 
                 Mouse.Capture(this);
@@ -194,7 +181,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private void Shape_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_isDraggingRubberbandRect)
+            if (_rubberbandRect != null)
             {
                 return;
             }

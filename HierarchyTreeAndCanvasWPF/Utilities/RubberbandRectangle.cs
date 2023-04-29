@@ -40,9 +40,9 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
                 Fill = Brushes.Black,
                 Opacity = 0.5
             };
-
             Canvas.SetLeft(_visualRect, _initPos.X);
             Canvas.SetTop(_visualRect, _initPos.Y);
+            _vm.CanvasShapes.Add(_visualRect);
         }
 
         public Rectangle GetRectangle()
@@ -93,9 +93,6 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
                     _shapePreview.ShiftBottomSide(newHeight - _shapePreview.DesiredSize.Height, _canvas.ActualHeight);
                 }
             }
-
-            /*            Debug.WriteLine($"visualRect Width {_visualRect.DesiredSize.Width} Height {_visualRect.DesiredSize.Height}");
-                        Debug.WriteLine($"visualRect Left {Canvas.GetLeft(_visualRect)} Top {Canvas.GetTop(_visualRect)}");*/
         }
 
         public void DragStop()
@@ -104,6 +101,7 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
             {
                 SelectShapesWithin();
             }
+            _vm.CanvasShapes.Remove(_visualRect);
         }
 
         private void SelectShapesWithin()

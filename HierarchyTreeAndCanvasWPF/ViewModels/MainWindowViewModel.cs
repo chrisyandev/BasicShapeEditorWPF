@@ -103,8 +103,6 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             {
                 Polygon newTriangle = ShapeFactory.CreateShape(
                     ShapeType.Triangle, 0, 0, Brushes.Green, ShapeMinWidth, ShapeMinHeight) as Polygon;
-/*                double centroidX = (newTriangle.Points[0].X + newTriangle.Points[1].X + newTriangle.Points[2].X) / 3;
-                double centroidY = (newTriangle.Points[0].Y + newTriangle.Points[1].Y + newTriangle.Points[2].Y) / 3;*/
                 Canvas.SetLeft(newTriangle, mousePosX);
                 Canvas.SetTop(newTriangle, mousePosY);
                 CanvasShapes.Add(newTriangle);
