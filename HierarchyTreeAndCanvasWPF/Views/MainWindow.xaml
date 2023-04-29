@@ -28,7 +28,8 @@
                       ItemsSource="{Binding CanvasShapes}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <controls:ShapeCanvas Background="Orange"
+                    <controls:ShapeCanvas x:Name="shapeCanvas"
+                                          Background="Orange"
                                           AllowDrop="True"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>

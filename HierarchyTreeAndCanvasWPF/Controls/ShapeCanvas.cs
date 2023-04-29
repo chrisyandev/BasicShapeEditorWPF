@@ -35,20 +35,24 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public ShapeCanvas()
         {
-            _vm = DataContext as IShapeCanvasViewModel;
-
             Initialized += Canvas_Initialized;
-            DragOver += Canvas_DragOver;
+            MouseLeftButtonDown += Canvas_MouseLeftButtonDown;
             MouseLeftButtonUp += Canvas_MouseLeftButtonUp;
-            MouseRightButtonUp += Canvas_MouseRightButtonUp;
             MouseRightButtonDown += Canvas_MouseRightButtonDown;
+            MouseRightButtonUp += Canvas_MouseRightButtonUp;
             MouseMove += Canvas_MouseMove;
+            DragOver += Canvas_DragOver;
         }
 
         private void Canvas_Initialized(object sender, EventArgs e)
         {
             _vm = (IShapeCanvasViewModel)DataContext;
             _shapeCanvasAdornerLayer = AdornerLayer.GetAdornerLayer(this);
+        }
+
+        private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
         }
 
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -78,6 +82,11 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             {
                 SetupShapeEventHandlers(shape);
             }*/
+        }
+
+        private void Canvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -110,11 +119,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 Mouse.Capture(this);
                 _rubberbandRect.Update();
             }
-        }
-
-        private void Canvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-
         }
 
         private void Canvas_DragOver(object sender, DragEventArgs e)
@@ -256,9 +260,20 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             {
                 RemoveMultiResizeAdorner(ref _multiSelectionRect,
                     _shapeCanvasAdornerLayer, _vm.CanvasShapes);
-                _vm.SelectedCanvasShapes.Clear(); // clear only after disposing MultiResizeAdorner
+                _vm.SelectedCanvasShapes.Clear();
                 Debug.WriteLine($"cleared all selected shapes");
             }
+        }
+
+        public void DeleteSelectedShapes()
+        {
+            Debug.WriteLine($"DeleteSelectedShapes");
+
+            foreach (Shape shape in _vm.SelectedCanvasShapes)
+            {
+                _vm.CanvasShapes.Remove(shape);
+            }
+            DeselectAllShapes();
         }
 
         private MultiResizeAdorner CreateMultiResizeAdorner(
