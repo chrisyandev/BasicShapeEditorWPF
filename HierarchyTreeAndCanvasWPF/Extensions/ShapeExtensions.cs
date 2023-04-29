@@ -217,28 +217,8 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
         private static double ShiftLeftSideTriangle(Polygon triangle, double units, double leftBoundary)
         {
-            List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
+            CalculateTrianglePoints(triangle, out Point leftPoint, out Point topPoint, out Point rightPoint);
             PointCollection newPoints = new PointCollection();
-
-            Point leftPoint;
-            Point topPoint;
-            Point rightPoint;
-
-            foreach (Point point in triangle.Points)
-            {
-                if (point.X == pointsXAxis.Min())
-                {
-                    leftPoint = point;
-                }
-                else if (point.X > pointsXAxis.Min() && point.X < pointsXAxis.Max())
-                {
-                    topPoint = point;
-                }
-                else if (point.X == pointsXAxis.Max())
-                {
-                    rightPoint = point;
-                }
-            }
 
             Point newLeftPoint = leftPoint;
             Point newTopPoint = topPoint;
@@ -278,28 +258,8 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
         private static double ShiftTopSideTriangle(Polygon triangle, double units, double topBoundary)
         {
-            List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
+            CalculateTrianglePoints(triangle, out Point leftPoint, out Point topPoint, out Point rightPoint);
             PointCollection newPoints = new PointCollection();
-
-            Point leftPoint;
-            Point topPoint;
-            Point rightPoint;
-
-            foreach (Point point in triangle.Points)
-            {
-                if (point.X == pointsXAxis.Min())
-                {
-                    leftPoint = point;
-                }
-                else if (point.X > pointsXAxis.Min() && point.X < pointsXAxis.Max())
-                {
-                    topPoint = point;
-                }
-                else if (point.X == pointsXAxis.Max())
-                {
-                    rightPoint = point;
-                }
-            }
 
             Point newLeftPoint = leftPoint;
             Point newTopPoint = topPoint;
@@ -339,28 +299,8 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
         private static double ShiftRightSideTriangle(Polygon triangle, double units, double rightBoundary)
         {
-            List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
+            CalculateTrianglePoints(triangle, out Point leftPoint, out Point topPoint, out Point rightPoint);
             PointCollection newPoints = new PointCollection();
-
-            Point leftPoint;
-            Point topPoint;
-            Point rightPoint;
-
-            foreach (Point point in triangle.Points)
-            {
-                if (point.X == pointsXAxis.Min())
-                {
-                    leftPoint = point;
-                }
-                else if (point.X > pointsXAxis.Min() && point.X < pointsXAxis.Max())
-                {
-                    topPoint = point;
-                }
-                else if (point.X == pointsXAxis.Max())
-                {
-                    rightPoint = point;
-                }
-            }
 
             Point newLeftPoint = leftPoint;
             Point newTopPoint = topPoint;
@@ -395,28 +335,8 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 
         private static double ShiftBottomSideTriangle(Polygon triangle, double units, double bottomBoundary)
         {
-            List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
+            CalculateTrianglePoints(triangle, out Point leftPoint, out Point topPoint, out Point rightPoint);
             PointCollection newPoints = new PointCollection();
-
-            Point leftPoint;
-            Point topPoint;
-            Point rightPoint;
-
-            foreach (Point point in triangle.Points)
-            {
-                if (point.X == pointsXAxis.Min())
-                {
-                    leftPoint = point;
-                }
-                else if (point.X > pointsXAxis.Min() && point.X < pointsXAxis.Max())
-                {
-                    topPoint = point;
-                }
-                else if (point.X == pointsXAxis.Max())
-                {
-                    rightPoint = point;
-                }
-            }
 
             Point newLeftPoint = leftPoint;
             Point newTopPoint = topPoint;
@@ -447,6 +367,38 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
             triangle.Points = newPoints;
 
             return newHeight - height;
+        }
+
+        private static void CalculateTrianglePoints(Polygon triangle, out Point leftPoint, out Point topPoint, out Point rightPoint)
+        {
+            List<double> pointsXAxis = triangle.Points.Select(p => p.X).ToList();
+
+            // if width of triangle is 0 (don't worry about height because we use X axis to determine which point is which)
+            if (pointsXAxis[0] == pointsXAxis[1] && pointsXAxis[1] == pointsXAxis[2])
+            {
+                leftPoint = triangle.Points[0];
+                topPoint = triangle.Points[1];
+                rightPoint = triangle.Points[2];
+            }
+            else
+            {
+                // calculate which point on the triangle each point represents
+                foreach (Point point in triangle.Points)
+                {
+                    if (point.X == pointsXAxis.Min())
+                    {
+                        leftPoint = point;
+                    }
+                    else if (point.X > pointsXAxis.Min() && point.X < pointsXAxis.Max())
+                    {
+                        topPoint = point;
+                    }
+                    else if (point.X == pointsXAxis.Max())
+                    {
+                        rightPoint = point;
+                    }
+                }
+            }
         }
     }
 }
