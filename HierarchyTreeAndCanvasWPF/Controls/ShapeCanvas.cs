@@ -58,7 +58,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 _isDraggingRubberbandRect = false;
                 Mouse.Capture(null);
                 DeselectAllShapes();
-                _rubberbandRect.SelectShapesWithin();
+                _rubberbandRect.DragStop();
                 _vm.CanvasShapes.Remove(_rubberbandRect.GetRectangle());
                 _rubberbandRect = null;
             }

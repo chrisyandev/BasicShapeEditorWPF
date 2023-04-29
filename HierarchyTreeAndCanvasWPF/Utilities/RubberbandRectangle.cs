@@ -50,6 +50,10 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
             return _visualRect;
         }
 
+        /// <summary>
+        /// Updates rubberband rectangle size and preview shape if exists.
+        /// Handles dragging in the negative direction so width and height will never be negative.
+        /// </summary>
         public void Update()
         {
             Point newPos = Mouse.GetPosition(_canvas);
@@ -94,7 +98,15 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
                         Debug.WriteLine($"visualRect Left {Canvas.GetLeft(_visualRect)} Top {Canvas.GetTop(_visualRect)}");*/
         }
 
-        public void SelectShapesWithin()
+        public void DragStop()
+        {
+            if (_shapePreview == null)
+            {
+                SelectShapesWithin();
+            }
+        }
+
+        private void SelectShapesWithin()
         {
             Debug.WriteLine("SelectShapesWithin");
 
