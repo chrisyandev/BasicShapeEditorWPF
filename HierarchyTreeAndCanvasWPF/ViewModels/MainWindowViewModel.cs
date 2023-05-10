@@ -1,5 +1,4 @@
-﻿using HierarchyTreeAndCanvasWPF.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -15,6 +14,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using HierarchyTreeAndCanvasWPF.Utilities;
+using HierarchyTreeAndCanvasWPF.Controls;
+using System.Reflection.PortableExecutable;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
@@ -28,10 +29,10 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
         {
             TreeItems = new ObservableCollection<TreeItem>
             {
-                new TreeItem(0, "Square"),
-                new TreeItem(1, "Triangle")
+                new TreeItem("Square", null, null),
+                new TreeItem("Triangle", null, null)
             };
-            TreeItems[1].Items.Add(new TreeItem(2, "Circle"));
+            TreeItems[1].Items.Add(new TreeItem("Circle", null, null));
 
             CanvasShapes = new ObservableCollection<Shape>();
             SelectedCanvasShapes = new ObservableCollection<Shape>();
@@ -81,35 +82,34 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             double mousePosX = Mouse.GetPosition(canvas).X;
             double mousePosY = Mouse.GetPosition(canvas).Y;
 
+            Shape newShape = null;
+
             if (shapeName == "rectangle")
             {
-                Rectangle newRectangle = ShapeFactory.CreateShape(
+                newShape = ShapeFactory.CreateShape(
                     ShapeType.Rectangle, 0, 0, Brushes.Blue, ShapeMinWidth, ShapeMinHeight) as Rectangle;
-                Canvas.SetLeft(newRectangle, mousePosX);
-                Canvas.SetTop(newRectangle, mousePosY);
-                CanvasShapes.Add(newRectangle);
-                return newRectangle;
             }
             else if (shapeName == "ellipse")
             {
-                Ellipse newEllipse = ShapeFactory.CreateShape(
+                newShape = ShapeFactory.CreateShape(
                     ShapeType.Ellipse, 0, 0, Brushes.Red, ShapeMinWidth, ShapeMinHeight) as Ellipse;
-                Canvas.SetLeft(newEllipse, mousePosX);
-                Canvas.SetTop(newEllipse, mousePosY);
-                CanvasShapes.Add(newEllipse);
-                return newEllipse;
+
             }
             else if (shapeName == "triangle")
             {
-                Polygon newTriangle = ShapeFactory.CreateShape(
+                newShape = ShapeFactory.CreateShape(
                     ShapeType.Triangle, 0, 0, Brushes.Green, ShapeMinWidth, ShapeMinHeight) as Polygon;
-                Canvas.SetLeft(newTriangle, mousePosX);
-                Canvas.SetTop(newTriangle, mousePosY);
-                CanvasShapes.Add(newTriangle);
-                return newTriangle;
             }
 
-            return null;
+            if (newShape != null)
+            {
+                Canvas.SetLeft(newShape, mousePosX);
+                Canvas.SetTop(newShape, mousePosY);
+                CanvasShapes.Add(newShape);
+                TreeItems.Add(new TreeItem(shapeName, newShape, canvas));
+            }
+
+            return newShape;
         }
     }
 }

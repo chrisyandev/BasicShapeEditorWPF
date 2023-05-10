@@ -19,10 +19,9 @@
             <ColumnDefinition Width="0.75*"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView Grid.Column="0"
-                  Name="myTree"
-                  ItemsSource="{Binding TreeItems}"
-                  Background="LightYellow"/>
+        <controls:HierarchyTreeView Grid.Column="0"
+                                    ItemsSource="{Binding TreeItems}"
+                                    Background="LightYellow"/>
 
         <ItemsControl Grid.Column="1"
                       ItemsSource="{Binding CanvasShapes}">

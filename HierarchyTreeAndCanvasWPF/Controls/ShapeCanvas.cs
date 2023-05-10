@@ -27,11 +27,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         private IShapeCanvasViewModel _vm;
         RubberbandRectangle _rubberbandRect;
 
-        static ShapeCanvas()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ShapeCanvas), new FrameworkPropertyMetadata(typeof(ShapeCanvas)));
-        }
-
         public ShapeCanvas()
         {
             Initialized += Canvas_Initialized;
