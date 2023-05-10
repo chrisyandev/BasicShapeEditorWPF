@@ -30,6 +30,9 @@ namespace HierarchyTreeAndCanvasWPF.Views
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             _shapeCanvas = UIHelper.FindChild<ShapeCanvas>(this, "shapeCanvas");
+
+            _shapeCanvas.ShapeSelected += hierarchyTreeView.HandleShapeSelected;
+            hierarchyTreeView.ShapeSelected += _shapeCanvas.HandleShapeSelected;
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)

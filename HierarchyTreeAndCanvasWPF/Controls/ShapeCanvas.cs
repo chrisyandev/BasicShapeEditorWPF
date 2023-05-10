@@ -38,6 +38,74 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             DragOver += Canvas_DragOver;
         }
 
+        public event EventHandler<Shape> ShapeSelected;
+
+        public void SelectOnly(Shape shape)
+        {
+            DeselectAllShapes();
+            AddShapeToSelection(shape);
+        }
+
+        public void SelectAdditional(Shape shape)
+        {
+            AddShapeToSelection(shape);
+        }
+
+        public void DeselectAllShapes()
+        {
+            Debug.WriteLine($"DeselectAllShapes");
+
+            // if not null, something is selected
+            if (_multiSelectionRect != null)
+            {
+                RemoveMultiResizeAdorner(ref _multiSelectionRect,
+                    _shapeCanvasAdornerLayer, _vm.CanvasShapes);
+                _vm.SelectedCanvasShapes.Clear();
+                Debug.WriteLine($"cleared all selected shapes");
+            }
+        }
+
+        public void DeleteSelectedShapes()
+        {
+            Debug.WriteLine($"DeleteSelectedShapes");
+
+            foreach (Shape shape in _vm.SelectedCanvasShapes)
+            {
+                _vm.CanvasShapes.Remove(shape);
+            }
+            DeselectAllShapes();
+        }
+
+        public void HandleShapeSelected(object sender, Shape shape)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control
+                || Keyboard.Modifiers == ModifierKeys.Shift)
+            {
+                SelectAdditional(shape);
+            }
+            else
+            {
+                SelectOnly(shape);
+            }
+        }
+
+        private void AddShapeToSelection(Shape shape)
+        {
+            Debug.WriteLine($"AddShapeToSelection");
+
+            // if null, adorner layer's adorners is also null, meaning nothing is selected
+            if (_multiSelectionRect == null)
+            {
+                _shapeCanvasAdornerLayer.Add(CreateMultiResizeAdorner(
+                    ref _multiSelectionRect, _vm.CanvasShapes,
+                    _vm.SelectedCanvasShapes, this, shape));
+            }
+            _vm.SelectedCanvasShapes.Add(shape);
+            Debug.WriteLine($"selected {shape}");
+
+            ShapeSelected(this, shape);
+        }
+
         private void Canvas_Initialized(object sender, EventArgs e)
         {
             _vm = (IShapeCanvasViewModel)DataContext;
@@ -165,12 +233,11 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             if (Keyboard.Modifiers == ModifierKeys.Control
                 || Keyboard.Modifiers == ModifierKeys.Shift)
             {
-                AddShapeToSelection(shape);
+                SelectAdditional(shape);
             }
             else
             {
-                DeselectAllShapes();
-                AddShapeToSelection(shape);
+                SelectOnly(shape);
             }
         }
 
@@ -191,8 +258,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 // if this shape was not selected before dragging, only drag this shape
                 if (shape != _multiSelectionRect && !_vm.SelectedCanvasShapes.Contains(shape))
                 {
-                    DeselectAllShapes();
-                    AddShapeToSelection(shape);
+                    SelectOnly(shape);
                 }
 
                 Point cursorStartPoint = Mouse.GetPosition(this);
@@ -216,46 +282,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 Canvas.SetLeft(shape, Canvas.GetLeft(shape) + unitsX);
                 Canvas.SetTop(shape, Canvas.GetTop(shape) + unitsY);
             }
-        }
-
-        public void AddShapeToSelection(Shape shape)
-        {
-            Debug.WriteLine($"AddShapeToSelection");
-
-            // if null, adorner layer's adorners is also null, meaning nothing is selected
-            if (_multiSelectionRect == null)
-            {
-                _shapeCanvasAdornerLayer.Add(CreateMultiResizeAdorner(
-                    ref _multiSelectionRect, _vm.CanvasShapes,
-                    _vm.SelectedCanvasShapes, this, shape));
-            }
-            _vm.SelectedCanvasShapes.Add(shape);
-            Debug.WriteLine($"selected {shape}");
-        }
-
-        public void DeselectAllShapes()
-        {
-            Debug.WriteLine($"DeselectAllShapes");
-
-            // if not null, something is selected
-            if (_multiSelectionRect != null)
-            {
-                RemoveMultiResizeAdorner(ref _multiSelectionRect,
-                    _shapeCanvasAdornerLayer, _vm.CanvasShapes);
-                _vm.SelectedCanvasShapes.Clear();
-                Debug.WriteLine($"cleared all selected shapes");
-            }
-        }
-
-        public void DeleteSelectedShapes()
-        {
-            Debug.WriteLine($"DeleteSelectedShapes");
-
-            foreach (Shape shape in _vm.SelectedCanvasShapes)
-            {
-                _vm.CanvasShapes.Remove(shape);
-            }
-            DeselectAllShapes();
         }
 
         private MultiResizeAdorner CreateMultiResizeAdorner(

@@ -19,7 +19,8 @@
             <ColumnDefinition Width="0.75*"/>
         </Grid.ColumnDefinitions>
 
-        <controls:HierarchyTreeView Grid.Column="0"
+        <controls:HierarchyTreeView x:Name="hierarchyTreeView"
+                                    Grid.Column="0"
                                     ItemsSource="{Binding TreeItems}"
                                     Background="LightYellow"/>
 

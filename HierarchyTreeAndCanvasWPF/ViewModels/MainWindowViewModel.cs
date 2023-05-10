@@ -29,10 +29,10 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
         {
             TreeItems = new ObservableCollection<TreeItem>
             {
-                new TreeItem("Square", null, null),
-                new TreeItem("Triangle", null, null)
+                new TreeItem("Square", null),
+                new TreeItem("Triangle", null)
             };
-            TreeItems[1].Items.Add(new TreeItem("Circle", null, null));
+            TreeItems[1].Items.Add(new TreeItem("Circle", null));
 
             CanvasShapes = new ObservableCollection<Shape>();
             SelectedCanvasShapes = new ObservableCollection<Shape>();
@@ -106,7 +106,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 Canvas.SetLeft(newShape, mousePosX);
                 Canvas.SetTop(newShape, mousePosY);
                 CanvasShapes.Add(newShape);
-                TreeItems.Add(new TreeItem(shapeName, newShape, canvas));
+                TreeItems.Add(new TreeItem(shapeName, newShape));
             }
 
             return newShape;

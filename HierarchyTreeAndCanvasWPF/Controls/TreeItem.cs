@@ -11,18 +11,14 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 {
     public class TreeItem : TreeViewItem
     {
-        public TreeItem(string header, Shape shapeRef, Canvas canvasRef)
+        public TreeItem(string header, Shape shapeRef)
         {
             Header = header;
             ShapeRef = shapeRef;
-            CanvasRef = canvasRef;
 
             Debug.WriteLine(Parent);
         }
 
         public Shape ShapeRef { get; }
-        
-        public Canvas CanvasRef { get; }
-
     }
 }

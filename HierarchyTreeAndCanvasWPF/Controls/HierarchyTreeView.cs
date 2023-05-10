@@ -22,7 +22,29 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private IShapeCanvasViewModel _vm;
         private List<TreeItem> _selectedItems = new();
-        
+
+        public event EventHandler<Shape> ShapeSelected;
+
+        public void HandleShapeSelected(object sender, Shape shape)
+        {
+            foreach (TreeItem item in _vm.TreeItems)
+            {
+                if (item.ShapeRef == shape)
+                {
+                    if (Keyboard.Modifiers == ModifierKeys.Control
+                        || Keyboard.Modifiers == ModifierKeys.Shift)
+                    {
+                        SelectAdditional(item);
+                    }
+                    else
+                    {
+                        SelectOnly(item);
+                    }
+                    break;
+                }
+            }
+        }
+
         protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
@@ -46,28 +68,18 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         {
             base.OnSelectedItemChanged(e);
 
-            Debug.WriteLine($"SELECTED ITEM: {e.NewValue}");
-
-            // prevent default behavior
             if (e.NewValue is TreeItem item)
             {
-                Debug.WriteLine($"IS TREE ITEM");
+                Debug.WriteLine($"SELECTED ITEM: {item}");
 
+                // prevent default behavior
                 item.IsSelected = false;
 
-                if (Keyboard.Modifiers == ModifierKeys.Control
-                    || Keyboard.Modifiers == ModifierKeys.Shift)
-                {
-                    SelectAdditional(item);
-                }
-                else
-                {
-                    SelectSingle(item);
-                }
+                ShapeSelected(this, item.ShapeRef);
             }
         }
 
-        private void SelectSingle(TreeItem item)
+        private void SelectOnly(TreeItem item)
         {
             foreach (TreeItem i in _selectedItems)
             {
@@ -76,45 +88,12 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             _selectedItems.Clear();
             _selectedItems.Add(item);
             HighlightItem(item);
-
-            Shape shapeToSelect = null;
-            Debug.WriteLine($"SELECTED {item.ShapeRef}");
-            foreach (Shape shape in _vm.CanvasShapes)
-            {
-                if (shape == item.ShapeRef)
-                {
-                    Debug.WriteLine($"Found {shape}");
-                    shapeToSelect = shape;
-                }
-            }
-
-            if (shapeToSelect != null)
-            {
-                (item.CanvasRef as ShapeCanvas).DeselectAllShapes();
-                (item.CanvasRef as ShapeCanvas).AddShapeToSelection(shapeToSelect);
-            }
         }
 
         private void SelectAdditional(TreeItem item)
         {
             _selectedItems.Add(item);
             HighlightItem(item);
-
-            Shape shapeToSelect = null;
-            Debug.WriteLine($"SELECTED {item.ShapeRef}");
-            foreach (Shape shape in _vm.CanvasShapes)
-            {
-                if (shape == item.ShapeRef)
-                {
-                    Debug.WriteLine($"Found {shape}");
-                    shapeToSelect = shape;
-                }
-            }
-
-            if (shapeToSelect != null)
-            {
-                (item.CanvasRef as ShapeCanvas).AddShapeToSelection(shapeToSelect);
-            }
         }
 
         private void HighlightItem(TreeItem item)

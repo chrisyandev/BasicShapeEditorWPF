@@ -131,7 +131,7 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
 
             foreach (Shape shape in shapesToAdd)
             {
-                _canvas.AddShapeToSelection(shape);
+                _canvas.SelectAdditional(shape);
             }
         }
     }
