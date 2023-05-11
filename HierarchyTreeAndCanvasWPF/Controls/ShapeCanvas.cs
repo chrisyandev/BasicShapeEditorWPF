@@ -39,9 +39,9 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             DragOver += Canvas_DragOver;
         }
 
-        public event EventHandler<ShapeSelectedEventArgs> ShapeSelected;
+        public event EventHandler<ShapeStateChangedEventArgs> ShapeStateChanged;
 
-        public void HandleShapeSelected(object sender, ShapeSelectedEventArgs e)
+        public void HandleShapeStateChanged(object sender, ShapeStateChangedEventArgs e)
         {
             if (e.SelectionType == SelectionType.Additional)
             {
@@ -73,9 +73,28 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             {
                 RemoveMultiResizeAdorner(ref _multiSelectionRect,
                     _shapeCanvasAdornerLayer, _vm.CanvasShapes);
-                _vm.SelectedCanvasShapes.Clear();
-                Debug.WriteLine($"cleared all selected shapes");
+
+                List<Shape> shapesToDeselect = _vm.SelectedCanvasShapes.ToList();
+
+                foreach (Shape shape in shapesToDeselect)
+                {
+                    DeselectShapeAndRaiseEvent(shape);
+                }
+
+                Debug.WriteLine($"deselected all selected shapes");
             }
+        }
+
+        public void DeselectShape(Shape shape)
+        {
+            _vm.SelectedCanvasShapes.Remove(shape);
+        }
+
+        public void DeselectShapeAndRaiseEvent(Shape shape)
+        {
+            DeselectShape(shape);
+
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, false));
         }
 
         public void DeleteSelectedShapes()
@@ -92,13 +111,13 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         public void SelectOnlyAndRaiseEvent(Shape shape)
         {
             SelectOnly(shape);
-            ShapeSelected(this, new ShapeSelectedEventArgs(shape, SelectionType.Only));
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Only));
         }
 
         public void SelectAdditionalAndRaiseEvent(Shape shape)
         {
             SelectAdditional(shape);
-            ShapeSelected(this, new ShapeSelectedEventArgs(shape, SelectionType.Additional));
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Additional));
         }
 
         private void AddShapeToSelection(Shape shape)

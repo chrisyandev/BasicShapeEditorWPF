@@ -24,22 +24,30 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         private IShapeCanvasViewModel _vm;
         private List<TreeItem> _selectedItems = new();
 
-        public event EventHandler<ShapeSelectedEventArgs> ShapeSelected;
+        public event EventHandler<ShapeStateChangedEventArgs> ShapeSelected;
 
-        public void HandleShapeSelected(object sender, ShapeSelectedEventArgs e)
+        public void HandleShapeSelected(object sender, ShapeStateChangedEventArgs e)
         {
             foreach (TreeItem item in _vm.TreeItems)
             {
                 if (item.ShapeRef == e.Shape)
                 {
-                    if (e.SelectionType == SelectionType.Additional)
+                    if (e.Selected)
                     {
-                        SelectAdditional(item);
+                        if (e.SelectionType == SelectionType.Additional)
+                        {
+                            SelectAdditional(item);
+                        }
+                        else if (e.SelectionType == SelectionType.Only)
+                        {
+                            SelectOnly(item);
+                        }
                     }
-                    else if (e.SelectionType == SelectionType.Only)
+                    else
                     {
-                        SelectOnly(item);
+                        RemoveHighlight(item);
                     }
+
                     break;
                 }
             }
@@ -107,13 +115,13 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         private void SelectOnlyAndRaiseEvent(TreeItem item)
         {
             SelectOnly(item);
-            ShapeSelected(this, new ShapeSelectedEventArgs(item.ShapeRef, SelectionType.Only));
+            ShapeSelected(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Only));
         }
 
         private void SelectAdditionalAndRaiseEvent(TreeItem item)
         {
             SelectAdditional(item);
-            ShapeSelected(this, new ShapeSelectedEventArgs(item.ShapeRef, SelectionType.Additional));
+            ShapeSelected(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Additional));
         }
 
         private void HighlightItem(TreeItem item)

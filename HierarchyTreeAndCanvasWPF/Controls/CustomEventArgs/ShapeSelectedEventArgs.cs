@@ -7,20 +7,23 @@ using System.Windows.Shapes;
 
 namespace HierarchyTreeAndCanvasWPF.Controls.CustomEventArgs
 {
-    public class ShapeSelectedEventArgs : EventArgs
+    public class ShapeStateChangedEventArgs : EventArgs
     {
         public Shape Shape { get; }
+        public bool Selected { get; }
         public SelectionType SelectionType { get; }
 
-        public ShapeSelectedEventArgs(Shape shape, SelectionType selectionType)
+        public ShapeStateChangedEventArgs(Shape shape, bool selected, SelectionType selectionType = SelectionType.None)
         {
             Shape = shape;
+            Selected = selected;
             SelectionType = selectionType;
         }
     }
 
     public enum SelectionType
     {
+        None,
         Only,
         Additional
     }
