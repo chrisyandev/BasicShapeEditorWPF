@@ -83,6 +83,12 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 // prevent default behavior
                 item.IsSelected = false;
 
+                // prevent adding item more than once
+                if (_selectedItems.Contains(item))
+                {
+                    return;
+                }
+
                 if (Keyboard.Modifiers == ModifierKeys.Control
                     || Keyboard.Modifiers == ModifierKeys.Shift)
                 {
