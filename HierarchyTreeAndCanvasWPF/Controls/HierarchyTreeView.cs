@@ -13,6 +13,7 @@ using HierarchyTreeAndCanvasWPF.ViewModels;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using HierarchyTreeAndCanvasWPF.Controls.CustomEventArgs;
 
 namespace HierarchyTreeAndCanvasWPF.Controls
 {
@@ -23,20 +24,19 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         private IShapeCanvasViewModel _vm;
         private List<TreeItem> _selectedItems = new();
 
-        public event EventHandler<Shape> ShapeSelected;
+        public event EventHandler<ShapeSelectedEventArgs> ShapeSelected;
 
-        public void HandleShapeSelected(object sender, Shape shape)
+        public void HandleShapeSelected(object sender, ShapeSelectedEventArgs e)
         {
             foreach (TreeItem item in _vm.TreeItems)
             {
-                if (item.ShapeRef == shape)
+                if (item.ShapeRef == e.Shape)
                 {
-                    if (Keyboard.Modifiers == ModifierKeys.Control
-                        || Keyboard.Modifiers == ModifierKeys.Shift)
+                    if (e.SelectionType == SelectionType.Additional)
                     {
                         SelectAdditional(item);
                     }
-                    else
+                    else if (e.SelectionType == SelectionType.Only)
                     {
                         SelectOnly(item);
                     }
@@ -75,7 +75,15 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 // prevent default behavior
                 item.IsSelected = false;
 
-                ShapeSelected(this, item.ShapeRef);
+                if (Keyboard.Modifiers == ModifierKeys.Control
+                    || Keyboard.Modifiers == ModifierKeys.Shift)
+                {
+                    SelectAdditionalAndRaiseEvent(item);
+                }
+                else
+                {
+                    SelectOnlyAndRaiseEvent(item);
+                }
             }
         }
 
@@ -94,6 +102,18 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         {
             _selectedItems.Add(item);
             HighlightItem(item);
+        }
+
+        private void SelectOnlyAndRaiseEvent(TreeItem item)
+        {
+            SelectOnly(item);
+            ShapeSelected(this, new ShapeSelectedEventArgs(item.ShapeRef, SelectionType.Only));
+        }
+
+        private void SelectAdditionalAndRaiseEvent(TreeItem item)
+        {
+            SelectAdditional(item);
+            ShapeSelected(this, new ShapeSelectedEventArgs(item.ShapeRef, SelectionType.Additional));
         }
 
         private void HighlightItem(TreeItem item)

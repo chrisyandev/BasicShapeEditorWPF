@@ -1,4 +1,5 @@
 ﻿using HierarchyTreeAndCanvasWPF.Adorners;
+using HierarchyTreeAndCanvasWPF.Controls.CustomEventArgs;
 using HierarchyTreeAndCanvasWPF.Utilities;
 using HierarchyTreeAndCanvasWPF.ViewModels;
 using System;
@@ -38,7 +39,19 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             DragOver += Canvas_DragOver;
         }
 
-        public event EventHandler<Shape> ShapeSelected;
+        public event EventHandler<ShapeSelectedEventArgs> ShapeSelected;
+
+        public void HandleShapeSelected(object sender, ShapeSelectedEventArgs e)
+        {
+            if (e.SelectionType == SelectionType.Additional)
+            {
+                SelectAdditional(e.Shape);
+            }
+            else if (e.SelectionType == SelectionType.Only)
+            {
+                SelectOnly(e.Shape);
+            }
+        }
 
         public void SelectOnly(Shape shape)
         {
@@ -76,17 +89,16 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             DeselectAllShapes();
         }
 
-        public void HandleShapeSelected(object sender, Shape shape)
+        public void SelectOnlyAndRaiseEvent(Shape shape)
         {
-            if (Keyboard.Modifiers == ModifierKeys.Control
-                || Keyboard.Modifiers == ModifierKeys.Shift)
-            {
-                SelectAdditional(shape);
-            }
-            else
-            {
-                SelectOnly(shape);
-            }
+            SelectOnly(shape);
+            ShapeSelected(this, new ShapeSelectedEventArgs(shape, SelectionType.Only));
+        }
+
+        public void SelectAdditionalAndRaiseEvent(Shape shape)
+        {
+            SelectAdditional(shape);
+            ShapeSelected(this, new ShapeSelectedEventArgs(shape, SelectionType.Additional));
         }
 
         private void AddShapeToSelection(Shape shape)
@@ -102,8 +114,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
             _vm.SelectedCanvasShapes.Add(shape);
             Debug.WriteLine($"selected {shape}");
-
-            ShapeSelected(this, shape);
         }
 
         private void Canvas_Initialized(object sender, EventArgs e)
@@ -233,11 +243,11 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             if (Keyboard.Modifiers == ModifierKeys.Control
                 || Keyboard.Modifiers == ModifierKeys.Shift)
             {
-                SelectAdditional(shape);
+                SelectAdditionalAndRaiseEvent(shape);
             }
             else
             {
-                SelectOnly(shape);
+                SelectOnlyAndRaiseEvent(shape);
             }
         }
 
@@ -258,7 +268,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 // if this shape was not selected before dragging, only drag this shape
                 if (shape != _multiSelectionRect && !_vm.SelectedCanvasShapes.Contains(shape))
                 {
-                    SelectOnly(shape);
+                    SelectOnlyAndRaiseEvent(shape);
                 }
 
                 Point cursorStartPoint = Mouse.GetPosition(this);
