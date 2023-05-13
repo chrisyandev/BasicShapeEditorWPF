@@ -19,14 +19,12 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 {
     public class HierarchyTreeView : TreeView
     {
-        private static readonly Brush HighlightSelectedBrush = (Brush)new BrushConverter().ConvertFrom("#0078D7");
-
         private IShapeCanvasViewModel _vm;
         private List<TreeItem> _selectedItems = new();
 
-        public event EventHandler<ShapeStateChangedEventArgs> ShapeSelected;
+        public event EventHandler<ShapeStateChangedEventArgs> ShapeStateChanged;
 
-        public void HandleShapeSelected(object sender, ShapeStateChangedEventArgs e)
+        public void HandleShapeStateChanged(object sender, ShapeStateChangedEventArgs e)
         {
             foreach (TreeItem item in _vm.TreeItems)
             {
@@ -45,7 +43,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                     }
                     else
                     {
-                        RemoveHighlight(item);
+                        DeselectItem(item);
                     }
 
                     break;
@@ -69,77 +67,89 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private void HierarchyTreeView_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Debug.WriteLine($"NEW ITEMS: {e.NewItems}");
+            Debug.WriteLine($"TREE: New items {e.NewItems}");
         }
 
         protected override void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
             base.OnSelectedItemChanged(e);
 
-            if (e.NewValue is TreeItem item)
+            Debug.WriteLine($"TREE: OnSelectedItemChanged Old> {e.OldValue} New> {e.NewValue}");
+
+            if (e.NewValue is TreeItem newItem)
             {
-                Debug.WriteLine($"SELECTED ITEM: {item}");
-
                 // prevent default behavior
-                item.IsSelected = false;
-
-                // prevent adding item more than once
-                if (_selectedItems.Contains(item))
-                {
-                    return;
-                }
+                newItem.IsSelected = false;
 
                 if (Keyboard.Modifiers == ModifierKeys.Control
                     || Keyboard.Modifiers == ModifierKeys.Shift)
                 {
-                    SelectAdditionalAndRaiseEvent(item);
+                    SelectAdditionalAndRaiseEvent(newItem);
                 }
                 else
                 {
-                    SelectOnlyAndRaiseEvent(item);
+                    SelectOnlyAndRaiseEvent(newItem);
                 }
+
+                Debug.WriteLine($"TREE: Selected items count {_selectedItems.Count}");
             }
         }
 
         private void SelectOnly(TreeItem item)
         {
-            foreach (TreeItem i in _selectedItems)
+            DeselectAllItems();
+
+            if (!_selectedItems.Contains(item))
             {
-                RemoveHighlight(i);
+                _selectedItems.Add(item);
+                item.MSelected = true;
             }
-            _selectedItems.Clear();
-            _selectedItems.Add(item);
-            HighlightItem(item);
         }
 
         private void SelectAdditional(TreeItem item)
         {
-            _selectedItems.Add(item);
-            HighlightItem(item);
+            if (!_selectedItems.Contains(item))
+            {
+                _selectedItems.Add(item);
+                item.MSelected = true;
+            }
         }
 
         private void SelectOnlyAndRaiseEvent(TreeItem item)
         {
             SelectOnly(item);
-            ShapeSelected(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Only));
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Only));
         }
 
         private void SelectAdditionalAndRaiseEvent(TreeItem item)
         {
             SelectAdditional(item);
-            ShapeSelected(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Additional));
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Additional));
         }
 
-        private void HighlightItem(TreeItem item)
+        private void DeselectAllItems()
         {
-            item.Background = HighlightSelectedBrush;
-            item.Foreground = Brushes.White;
+            Debug.WriteLine($"TREE: Deselecting all items");
+
+            for (int i = _selectedItems.Count - 1; i >= 0; i--)
+            {
+                DeselectItemAndRaiseEvent(_selectedItems[i]);
+            }
         }
 
-        private void RemoveHighlight(TreeItem item)
+        private void DeselectItem(TreeItem item)
         {
-            item.Background = Brushes.Transparent;
-            item.Foreground = Brushes.Black;
+            _selectedItems.Remove(item);
+            item.MSelected = false;
+
+            Debug.WriteLine($"TREE: Deselected {item.Header}");
         }
+
+        private void DeselectItemAndRaiseEvent(TreeItem item)
+        {
+            DeselectItem(item);
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, false));
+        }
+
     }
 }

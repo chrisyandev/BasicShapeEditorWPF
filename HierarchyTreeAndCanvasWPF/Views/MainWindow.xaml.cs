@@ -31,8 +31,8 @@ namespace HierarchyTreeAndCanvasWPF.Views
         {
             _shapeCanvas = UIHelper.FindChild<ShapeCanvas>(this, "shapeCanvas");
 
-            _shapeCanvas.ShapeStateChanged += hierarchyTreeView.HandleShapeSelected;
-            hierarchyTreeView.ShapeSelected += _shapeCanvas.HandleShapeStateChanged;
+            _shapeCanvas.ShapeStateChanged += hierarchyTreeView.HandleShapeStateChanged;
+            hierarchyTreeView.ShapeStateChanged += _shapeCanvas.HandleShapeStateChanged;
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -40,6 +40,10 @@ namespace HierarchyTreeAndCanvasWPF.Views
             if (e.Key == Key.Delete)
             {
                 _shapeCanvas.DeleteSelectedShapes();
+            }
+            else if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                _shapeCanvas.SelectAllShapes();
             }
         }
     }

@@ -43,13 +43,20 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public void HandleShapeStateChanged(object sender, ShapeStateChangedEventArgs e)
         {
-            if (e.SelectionType == SelectionType.Additional)
+            if (e.Selected)
             {
-                SelectAdditional(e.Shape);
+                if (e.SelectionType == SelectionType.Additional)
+                {
+                    SelectAdditional(e.Shape);
+                }
+                else if (e.SelectionType == SelectionType.Only)
+                {
+                    SelectOnly(e.Shape);
+                }
             }
-            else if (e.SelectionType == SelectionType.Only)
+            else
             {
-                SelectOnly(e.Shape);
+                DeselectShape(e.Shape);
             }
         }
 
@@ -64,6 +71,26 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             AddShapeToSelection(shape);
         }
 
+        public void SelectOnlyAndRaiseEvent(Shape shape)
+        {
+            SelectOnly(shape);
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Only));
+        }
+
+        public void SelectAdditionalAndRaiseEvent(Shape shape)
+        {
+            SelectAdditional(shape);
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Additional));
+        }
+
+        public void SelectAllShapes()
+        {
+            for (int i = 0; i < _vm.CanvasShapes.Count; i++)
+            {
+                SelectAdditionalAndRaiseEvent(_vm.CanvasShapes[i]);
+            }
+        }
+
         public void DeselectAllShapes()
         {
             Debug.WriteLine($"DeselectAllShapes");
@@ -74,11 +101,9 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 RemoveMultiResizeAdorner(ref _multiSelectionRect,
                     _shapeCanvasAdornerLayer, _vm.CanvasShapes);
 
-                List<Shape> shapesToDeselect = _vm.SelectedCanvasShapes.ToList();
-
-                foreach (Shape shape in shapesToDeselect)
+                for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
                 {
-                    DeselectShapeAndRaiseEvent(shape);
+                    DeselectShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
                 }
 
                 Debug.WriteLine($"deselected all selected shapes");
@@ -108,18 +133,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             DeselectAllShapes();
         }
 
-        public void SelectOnlyAndRaiseEvent(Shape shape)
-        {
-            SelectOnly(shape);
-            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Only));
-        }
-
-        public void SelectAdditionalAndRaiseEvent(Shape shape)
-        {
-            SelectAdditional(shape);
-            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Additional));
-        }
-
         private void AddShapeToSelection(Shape shape)
         {
             Debug.WriteLine($"AddShapeToSelection");
@@ -131,7 +144,12 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                     ref _multiSelectionRect, _vm.CanvasShapes,
                     _vm.SelectedCanvasShapes, this, shape));
             }
-            _vm.SelectedCanvasShapes.Add(shape);
+
+            if (!_vm.SelectedCanvasShapes.Contains(shape))
+            {
+                _vm.SelectedCanvasShapes.Add(shape);
+            }
+            
             Debug.WriteLine($"selected {shape}");
         }
 
