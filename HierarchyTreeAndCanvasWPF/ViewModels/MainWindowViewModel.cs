@@ -27,13 +27,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
 
         public MainWindowViewModel()
         {
-            TreeItems = new ObservableCollection<TreeItem>
-            {
-                new TreeItem("Square", null),
-                new TreeItem("Triangle", null)
-            };
-            TreeItems[1].Items.Add(new TreeItem("Circle", null));
-
+            TreeItems = new ObservableCollection<TreeItem>();
             CanvasShapes = new ObservableCollection<Shape>();
             SelectedCanvasShapes = new ObservableCollection<Shape>();
 

@@ -12,12 +12,15 @@ namespace HierarchyTreeAndCanvasWPF.Controls.CustomEventArgs
         public Shape Shape { get; }
         public bool Selected { get; }
         public SelectionType SelectionType { get; }
+        public bool Removed { get; }
 
-        public ShapeStateChangedEventArgs(Shape shape, bool selected, SelectionType selectionType = SelectionType.None)
+        public ShapeStateChangedEventArgs(Shape shape, bool selected, 
+            SelectionType selectionType = SelectionType.None, bool removed = false)
         {
             Shape = shape;
             Selected = selected;
             SelectionType = selectionType;
+            Removed = removed;
         }
     }
 

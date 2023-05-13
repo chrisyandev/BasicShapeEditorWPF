@@ -54,6 +54,10 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                     SelectOnly(e.Shape);
                 }
             }
+            else if (e.Removed)
+            {
+                RemoveShape(e.Shape);
+            }
             else
             {
                 DeselectShape(e.Shape);
@@ -93,44 +97,55 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public void DeselectAllShapes()
         {
-            Debug.WriteLine($"DeselectAllShapes");
+            Debug.WriteLine($"Canvas: DeselectAllShapes");
 
-            // if not null, something is selected
-            if (_multiSelectionRect != null)
+            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
             {
-                RemoveMultiResizeAdorner(ref _multiSelectionRect,
-                    _shapeCanvasAdornerLayer, _vm.CanvasShapes);
-
-                for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
-                {
-                    DeselectShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
-                }
-
-                Debug.WriteLine($"deselected all selected shapes");
+                DeselectShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
             }
         }
 
         public void DeselectShape(Shape shape)
         {
+            Debug.WriteLine($"Canvas: deselecting {shape}");
+
             _vm.SelectedCanvasShapes.Remove(shape);
+
+            if (_vm.SelectedCanvasShapes.Count == 0 && _multiSelectionRect != null)
+            {
+                RemoveMultiResizeAdorner(ref _multiSelectionRect,
+                    _shapeCanvasAdornerLayer, _vm.CanvasShapes);
+
+                Debug.WriteLine($"Canvas: deselected all shapes");
+            }
         }
 
         public void DeselectShapeAndRaiseEvent(Shape shape)
         {
             DeselectShape(shape);
-
             ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, false));
         }
 
-        public void DeleteSelectedShapes()
+        public void RemoveSelectedShapes()
         {
-            Debug.WriteLine($"DeleteSelectedShapes");
+            Debug.WriteLine($"Canvas: RemoveSelectedShapes");
 
-            foreach (Shape shape in _vm.SelectedCanvasShapes)
+            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
             {
-                _vm.CanvasShapes.Remove(shape);
+                RemoveShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
             }
-            DeselectAllShapes();
+        }
+
+        public void RemoveShape(Shape shape)
+        {
+            DeselectShape(shape);
+            _vm.CanvasShapes.Remove(shape);
+        }
+
+        public void RemoveShapeAndRaiseEvent(Shape shape)
+        {
+            RemoveShape(shape);
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, false, removed: true));
         }
 
         private void AddShapeToSelection(Shape shape)

@@ -41,6 +41,10 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                             SelectOnly(item);
                         }
                     }
+                    else if (e.Removed)
+                    {
+                        RemoveItem(item);
+                    }
                     else
                     {
                         DeselectItem(item);
@@ -151,5 +155,15 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, false));
         }
 
+        private void RemoveItem(TreeItem item)
+        {
+            _vm.TreeItems.Remove(item);
+        }
+
+        private void RemoveItemAndRaiseEvent(TreeItem item)
+        {
+            RemoveItem(item);
+            ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, false, removed: true));
+        }
     }
 }

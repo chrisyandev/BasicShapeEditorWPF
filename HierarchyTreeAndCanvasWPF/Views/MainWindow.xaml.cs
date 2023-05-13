@@ -39,7 +39,7 @@ namespace HierarchyTreeAndCanvasWPF.Views
         {
             if (e.Key == Key.Delete)
             {
-                _shapeCanvas.DeleteSelectedShapes();
+                _shapeCanvas.RemoveSelectedShapes();
             }
             else if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control)
             {
