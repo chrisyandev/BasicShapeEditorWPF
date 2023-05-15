@@ -20,13 +20,13 @@ namespace HierarchyTreeAndCanvasWPF.Controls
     public class HierarchyTreeView : TreeView
     {
         private IShapeCanvasViewModel _vm;
-        private List<TreeItem> _selectedItems = new();
+        private List<ShapeTreeViewItem> _selectedItems = new();
 
         public event EventHandler<ShapeStateChangedEventArgs> ShapeStateChanged;
 
         public void HandleShapeStateChanged(object sender, ShapeStateChangedEventArgs e)
         {
-            foreach (TreeItem item in _vm.TreeItems)
+            foreach (ShapeTreeViewItem item in _vm.TreeItems)
             {
                 if (item.ShapeRef == e.Shape)
                 {
@@ -66,7 +66,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         {
             base.OnItemsSourceChanged(oldValue, newValue);
 
-            (ItemsSource as ObservableCollection<TreeItem>).CollectionChanged += HierarchyTreeView_CollectionChanged;
+            (ItemsSource as ObservableCollection<ShapeTreeViewItem>).CollectionChanged += HierarchyTreeView_CollectionChanged;
         }
 
         private void HierarchyTreeView_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -80,7 +80,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
             Debug.WriteLine($"TREE: OnSelectedItemChanged Old> {e.OldValue} New> {e.NewValue}");
 
-            if (e.NewValue is TreeItem newItem)
+            if (e.NewValue is ShapeTreeViewItem newItem)
             {
                 // prevent default behavior
                 newItem.IsSelected = false;
@@ -99,7 +99,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        private void SelectOnly(TreeItem item)
+        private void SelectOnly(ShapeTreeViewItem item)
         {
             DeselectAllItems();
 
@@ -110,7 +110,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        private void SelectAdditional(TreeItem item)
+        private void SelectAdditional(ShapeTreeViewItem item)
         {
             if (!_selectedItems.Contains(item))
             {
@@ -119,13 +119,13 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        private void SelectOnlyAndRaiseEvent(TreeItem item)
+        private void SelectOnlyAndRaiseEvent(ShapeTreeViewItem item)
         {
             SelectOnly(item);
             ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Only));
         }
 
-        private void SelectAdditionalAndRaiseEvent(TreeItem item)
+        private void SelectAdditionalAndRaiseEvent(ShapeTreeViewItem item)
         {
             SelectAdditional(item);
             ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, true, SelectionType.Additional));
@@ -141,7 +141,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        private void DeselectItem(TreeItem item)
+        private void DeselectItem(ShapeTreeViewItem item)
         {
             _selectedItems.Remove(item);
             item.MSelected = false;
@@ -149,18 +149,18 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             Debug.WriteLine($"TREE: Deselected {item.Header}");
         }
 
-        private void DeselectItemAndRaiseEvent(TreeItem item)
+        private void DeselectItemAndRaiseEvent(ShapeTreeViewItem item)
         {
             DeselectItem(item);
             ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, false));
         }
 
-        private void RemoveItem(TreeItem item)
+        private void RemoveItem(ShapeTreeViewItem item)
         {
             _vm.TreeItems.Remove(item);
         }
 
-        private void RemoveItemAndRaiseEvent(TreeItem item)
+        private void RemoveItemAndRaiseEvent(ShapeTreeViewItem item)
         {
             RemoveItem(item);
             ShapeStateChanged(this, new ShapeStateChangedEventArgs(item.ShapeRef, false, removed: true));

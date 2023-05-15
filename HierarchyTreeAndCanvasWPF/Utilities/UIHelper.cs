@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace HierarchyTreeAndCanvasWPF.Utilities
 {
@@ -62,6 +63,21 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
             }
 
             return foundChild;
+        }
+
+        /// <summary>
+        /// Finds the TreeView the TreeViewItem belongs to.
+        /// </summary>
+        public static TreeView FindTreeView(TreeViewItem item)
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(item);
+
+            while (parent != null && !(parent is TreeView))
+            {
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+
+            return parent as TreeView;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
     public interface IShapeCanvasViewModel
     {
-        public ObservableCollection<TreeItem> TreeItems { get; set; }
+        public ObservableCollection<ShapeTreeViewItem> TreeItems { get; set; }
         public ObservableCollection<Shape> CanvasShapes { get; set; }
         public ObservableCollection<Shape> SelectedCanvasShapes { get; set; }
         public string ActiveTool { get; }
