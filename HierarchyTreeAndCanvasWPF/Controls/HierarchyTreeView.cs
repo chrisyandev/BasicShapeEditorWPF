@@ -106,7 +106,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             if (!_selectedItems.Contains(item))
             {
                 _selectedItems.Add(item);
-                item.MSelected = true;
+                item.Select();
             }
         }
 
@@ -115,7 +115,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             if (!_selectedItems.Contains(item))
             {
                 _selectedItems.Add(item);
-                item.MSelected = true;
+                item.Select();
             }
         }
 
@@ -144,7 +144,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         private void DeselectItem(ShapeTreeViewItem item)
         {
             _selectedItems.Remove(item);
-            item.MSelected = false;
+            item.Deselect();
 
             Debug.WriteLine($"TREE: Deselected {item.Header}");
         }

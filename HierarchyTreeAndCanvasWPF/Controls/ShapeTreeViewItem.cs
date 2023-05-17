@@ -41,6 +41,9 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             set
             {
                 if (_mSelected == value) { return; }
+
+                Debug.WriteLine($"{Header} _mSelected old: {_mSelected} /// new: {value}");
+
                 _mSelected = value;
 
                 if (value)
@@ -50,6 +53,32 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 else
                 {
                     RemoveHighlight();
+                }
+            }
+        }
+
+        public void Select()
+        {
+            MSelected = true;
+
+            if (Items.Count > 0)
+            {
+                foreach (ShapeTreeViewItem item in Items)
+                {
+                    item.Select();
+                }
+            }
+        }
+
+        public void Deselect()
+        {
+            MSelected = false;
+
+            if (Items.Count > 0)
+            {
+                foreach (ShapeTreeViewItem item in Items)
+                {
+                    item.Deselect();
                 }
             }
         }
@@ -109,7 +138,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             ShapeTreeViewItem droppedItem = e.Data.GetData(typeof(ShapeTreeViewItem)) as ShapeTreeViewItem;
             ShapeTreeViewItem receivingItem = e.Source as ShapeTreeViewItem;
 
-            if (droppedItem == receivingItem || droppedItem.Parent == receivingItem)
+            if (droppedItem == receivingItem || droppedItem.Parent == receivingItem || receivingItem.IsDescendantOf(droppedItem))
             {
                 return;
             }
@@ -118,9 +147,12 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             {
                 Debug.WriteLine($"Tree: dropped {droppedItem} /// onto /// {receivingItem}");
 
-                TreeView treeView = UIHelper.FindTreeView(droppedItem);
-
-                if (treeView != null)
+                if (droppedItem.Parent is ShapeTreeViewItem parentItem)
+                {
+                    parentItem.Items.Remove(droppedItem);
+                    receivingItem.Items.Add(droppedItem);
+                }
+                else if (UIHelper.FindTreeView(droppedItem) is TreeView treeView)
                 {
                     (treeView.ItemsSource as ObservableCollection<ShapeTreeViewItem>).Remove(droppedItem);
                     receivingItem.Items.Add(droppedItem);
