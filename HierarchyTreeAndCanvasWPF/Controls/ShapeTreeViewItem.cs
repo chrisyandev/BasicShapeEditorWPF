@@ -22,13 +22,16 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private bool _mSelected;
 
-        public ShapeTreeViewItem(string header, Shape shapeRef)
+        public ShapeTreeViewItem(string id, string header, Shape shapeRef)
         {
+            Id = id;
             Header = header;
             ShapeRef = shapeRef;
             _mSelected = false;
             AllowDrop = true;
         }
+
+        public string Id { get; }
 
         public Shape ShapeRef { get; }
 

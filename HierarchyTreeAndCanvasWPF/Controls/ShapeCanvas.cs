@@ -41,7 +41,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public event EventHandler<ShapeStateChangedEventArgs> ShapeStateChanged;
 
-        public void HandleShapeStateChanged(object sender, ShapeStateChangedEventArgs e)
+        public void OnShapeStateChanged(object sender, ShapeStateChangedEventArgs e)
         {
             if (e.Selected)
             {

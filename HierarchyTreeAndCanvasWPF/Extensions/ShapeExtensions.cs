@@ -13,6 +13,20 @@ namespace HierarchyTreeAndCanvasWPF.Extensions
 {
     public static class ShapeExtensions
     {
+        public static readonly DependencyProperty IdProperty =
+            DependencyProperty.RegisterAttached("Id", typeof(string),
+                typeof(ShapeExtensions), new PropertyMetadata(string.Empty));
+
+        public static void SetId(this Shape shape, string value)
+        {
+            shape.SetValue(IdProperty, value);
+        }
+
+        public static string GetId(this Shape shape)
+        {
+            return (string)shape.GetValue(IdProperty);
+        }
+
         /// <returns>How many units actually shifted</returns>
         public static double ShiftLeftSide(this Shape shape, double units, double leftBoundary)
         {
