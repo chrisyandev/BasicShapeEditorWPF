@@ -16,6 +16,7 @@ using System.Windows;
 using HierarchyTreeAndCanvasWPF.Utilities;
 using HierarchyTreeAndCanvasWPF.Controls;
 using HierarchyTreeAndCanvasWPF.Extensions;
+using HierarchyTreeAndCanvasWPF.Services;
 
 namespace HierarchyTreeAndCanvasWPF.ViewModels
 {
@@ -101,10 +102,10 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 Canvas.SetTop(newShape, mousePosY);
                 CanvasShapes.Add(newShape);
 
-                string newId = UIDGenerator.GenerateUniqueId();
+                ShapeTreeViewItem newItem = new ShapeTreeViewItem(shapeName);
+                TreeItems.Add(newItem);
 
-                newShape.SetId(newId);
-                TreeItems.Add(new ShapeTreeViewItem(newId, shapeName, newShape));
+                ShapeManager.Register(newShape, newItem);
             }
 
             return newShape;

@@ -1,4 +1,5 @@
-﻿using HierarchyTreeAndCanvasWPF.Utilities;
+﻿using HierarchyTreeAndCanvasWPF.Services;
+using HierarchyTreeAndCanvasWPF.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,18 +23,14 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private bool _mSelected;
 
-        public ShapeTreeViewItem(string id, string header, Shape shapeRef)
+        public ShapeTreeViewItem(string header)
         {
-            Id = id;
             Header = header;
-            ShapeRef = shapeRef;
             _mSelected = false;
             AllowDrop = true;
         }
 
-        public string Id { get; }
-
-        public Shape ShapeRef { get; }
+        public string Id { get; set; }
 
         public bool MSelected
         {
@@ -64,26 +61,26 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         {
             MSelected = true;
 
-            if (Items.Count > 0)
+/*            if (Items.Count > 0)
             {
                 foreach (ShapeTreeViewItem item in Items)
                 {
                     item.Select();
                 }
-            }
+            }*/
         }
 
         public void Deselect()
         {
             MSelected = false;
 
-            if (Items.Count > 0)
+/*            if (Items.Count > 0)
             {
                 foreach (ShapeTreeViewItem item in Items)
                 {
                     item.Deselect();
                 }
-            }
+            }*/
         }
 
         public void Highlight()
@@ -141,26 +138,27 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             ShapeTreeViewItem droppedItem = e.Data.GetData(typeof(ShapeTreeViewItem)) as ShapeTreeViewItem;
             ShapeTreeViewItem receivingItem = e.Source as ShapeTreeViewItem;
 
+            receivingItem.RemoveHighlight();
+
             if (droppedItem == receivingItem || droppedItem.Parent == receivingItem || receivingItem.IsDescendantOf(droppedItem))
             {
                 return;
             }
 
-            if (droppedItem != null && receivingItem != null)
-            {
-                Debug.WriteLine($"Tree: dropped {droppedItem} /// onto /// {receivingItem}");
+            Debug.WriteLine($"Tree: dropped {droppedItem} /// onto /// {receivingItem}");
 
-                if (droppedItem.Parent is ShapeTreeViewItem parentItem)
-                {
-                    parentItem.Items.Remove(droppedItem);
-                    receivingItem.Items.Add(droppedItem);
-                }
-                else if (UIHelper.FindTreeView(droppedItem) is TreeView treeView)
-                {
-                    (treeView.ItemsSource as ObservableCollection<ShapeTreeViewItem>).Remove(droppedItem);
-                    receivingItem.Items.Add(droppedItem);
-                }
+            if (droppedItem.Parent is ShapeTreeViewItem parentItem)
+            {
+                parentItem.Items.Remove(droppedItem);
+                receivingItem.Items.Add(droppedItem);
             }
+            else if (UIHelper.FindTreeView(droppedItem) is TreeView treeView)
+            {
+                (treeView.ItemsSource as ObservableCollection<ShapeTreeViewItem>).Remove(droppedItem);
+                receivingItem.Items.Add(droppedItem);
+            }
+
+            droppedItem.Highlight();
         }
 
     }

@@ -1,6 +1,5 @@
-﻿using HierarchyTreeAndCanvasWPF.Adorners;
-using HierarchyTreeAndCanvasWPF.Controls.CustomEventArgs;
-using HierarchyTreeAndCanvasWPF.Utilities;
+﻿using HierarchyTreeAndCanvasWPF.Extensions;
+using HierarchyTreeAndCanvasWPF.Services;
 using HierarchyTreeAndCanvasWPF.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -23,8 +22,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 {
     public class ShapeCanvas : Canvas
     {
-        private AdornerLayer _shapeCanvasAdornerLayer;
-        private Rectangle _multiSelectionRect;
         private IShapeCanvasViewModel _vm;
         RubberbandRectangle _rubberbandRect;
 
@@ -37,54 +34,36 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             MouseRightButtonUp += Canvas_MouseRightButtonUp;
             MouseMove += Canvas_MouseMove;
             DragOver += Canvas_DragOver;
+
+            ShapeEventMessenger.Subscribe(ShapeEventMessenger.SelectOnly, (shape, item) => SelectOnly(shape));
+            ShapeEventMessenger.Subscribe(ShapeEventMessenger.SelectAdditional, (shape, item) => SelectAdditional(shape));
+            ShapeEventMessenger.Subscribe(ShapeEventMessenger.Deselect, (shape, item) => DeselectShape(shape));
+            ShapeEventMessenger.Subscribe(ShapeEventMessenger.Remove, (shape, item) => RemoveShape(shape));
+
+            MultiSelectionRectangle.ActualRectangle.MouseMove += Shape_MouseMove;
         }
 
-        public event EventHandler<ShapeStateChangedEventArgs> ShapeStateChanged;
-
-        public void OnShapeStateChanged(object sender, ShapeStateChangedEventArgs e)
+        private void SelectOnly(Shape shape)
         {
-            if (e.Selected)
-            {
-                if (e.SelectionType == SelectionType.Additional)
-                {
-                    SelectAdditional(e.Shape);
-                }
-                else if (e.SelectionType == SelectionType.Only)
-                {
-                    SelectOnly(e.Shape);
-                }
-            }
-            else if (e.Removed)
-            {
-                RemoveShape(e.Shape);
-            }
-            else
-            {
-                DeselectShape(e.Shape);
-            }
-        }
-
-        public void SelectOnly(Shape shape)
-        {
-            DeselectAllShapes();
+            DeselectAllShapesExcept(shape);
             AddShapeToSelection(shape);
         }
 
-        public void SelectAdditional(Shape shape)
+        private void SelectAdditional(Shape shape)
         {
             AddShapeToSelection(shape);
         }
 
-        public void SelectOnlyAndRaiseEvent(Shape shape)
+        private void SelectOnlyAndRaiseEvent(Shape shape)
         {
             SelectOnly(shape);
-            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Only));
+            ShapeEventMessenger.Publish(ShapeEventMessenger.SelectOnly, shape.GetId());
         }
 
         public void SelectAdditionalAndRaiseEvent(Shape shape)
         {
             SelectAdditional(shape);
-            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, true, SelectionType.Additional));
+            ShapeEventMessenger.Publish(ShapeEventMessenger.SelectAdditional, shape.GetId());
         }
 
         public void SelectAllShapes()
@@ -95,7 +74,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        public void DeselectAllShapes()
+        private void DeselectAllShapes()
         {
             Debug.WriteLine($"Canvas: DeselectAllShapes");
 
@@ -105,25 +84,35 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        public void DeselectShape(Shape shape)
+        private void DeselectAllShapesExcept(Shape shape)
+        {
+            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
+            {
+                if (_vm.SelectedCanvasShapes[i] != shape)
+                {
+                    DeselectShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
+                }
+            }
+        }
+
+        private void DeselectShape(Shape shape)
         {
             Debug.WriteLine($"Canvas: deselecting {shape}");
 
             _vm.SelectedCanvasShapes.Remove(shape);
 
-            if (_vm.SelectedCanvasShapes.Count == 0 && _multiSelectionRect != null)
+            if (_vm.SelectedCanvasShapes.Count == 0)
             {
-                RemoveMultiResizeAdorner(ref _multiSelectionRect,
-                    _shapeCanvasAdornerLayer, _vm.CanvasShapes);
+                MultiSelectionRectangle.Hide(this, _vm);
 
                 Debug.WriteLine($"Canvas: deselected all shapes");
             }
         }
 
-        public void DeselectShapeAndRaiseEvent(Shape shape)
+        private void DeselectShapeAndRaiseEvent(Shape shape)
         {
             DeselectShape(shape);
-            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, false));
+            ShapeEventMessenger.Publish(ShapeEventMessenger.Deselect, shape.GetId());
         }
 
         public void RemoveSelectedShapes()
@@ -136,42 +125,38 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        public void RemoveShape(Shape shape)
+        private void RemoveShape(Shape shape)
         {
             DeselectShape(shape);
             _vm.CanvasShapes.Remove(shape);
         }
 
-        public void RemoveShapeAndRaiseEvent(Shape shape)
+        private void RemoveShapeAndRaiseEvent(Shape shape)
         {
             RemoveShape(shape);
-            ShapeStateChanged(this, new ShapeStateChangedEventArgs(shape, false, removed: true));
+            ShapeEventMessenger.Publish(ShapeEventMessenger.Remove, shape.GetId());
         }
 
         private void AddShapeToSelection(Shape shape)
         {
             Debug.WriteLine($"AddShapeToSelection");
 
-            // if null, adorner layer's adorners is also null, meaning nothing is selected
-            if (_multiSelectionRect == null)
+            if (!MultiSelectionRectangle.IsShowing)
             {
-                _shapeCanvasAdornerLayer.Add(CreateMultiResizeAdorner(
-                    ref _multiSelectionRect, _vm.CanvasShapes,
-                    _vm.SelectedCanvasShapes, this, shape));
+                MultiSelectionRectangle.Show(this, _vm, shape);
             }
 
             if (!_vm.SelectedCanvasShapes.Contains(shape))
             {
                 _vm.SelectedCanvasShapes.Add(shape);
             }
-            
+
             Debug.WriteLine($"selected {shape}");
         }
 
         private void Canvas_Initialized(object sender, EventArgs e)
         {
             _vm = (IShapeCanvasViewModel)DataContext;
-            _shapeCanvasAdornerLayer = AdornerLayer.GetAdornerLayer(this);
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -242,10 +227,10 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 && data["prevCursorPoint"] is Point prevCursorPoint)
             {
                 Point currCursorPoint = e.GetPosition(canvas);
-                double selectionLeft = Canvas.GetLeft(_multiSelectionRect);
-                double selectionTop = Canvas.GetTop(_multiSelectionRect);
-                double selectionRight = selectionLeft + _multiSelectionRect.Width;
-                double selectionBottom = selectionTop + _multiSelectionRect.Height;
+                double selectionLeft = Canvas.GetLeft(MultiSelectionRectangle.ActualRectangle);
+                double selectionTop = Canvas.GetTop(MultiSelectionRectangle.ActualRectangle);
+                double selectionRight = selectionLeft + MultiSelectionRectangle.ActualRectangle.Width;
+                double selectionBottom = selectionTop + MultiSelectionRectangle.ActualRectangle.Height;
                 double horizontalChange = currCursorPoint.X - prevCursorPoint.X;
                 double verticalChange = currCursorPoint.Y - prevCursorPoint.Y;
 
@@ -318,7 +303,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 Shape shape = sender as Shape;
 
                 // if this shape was not selected before dragging, only drag this shape
-                if (shape != _multiSelectionRect && !_vm.SelectedCanvasShapes.Contains(shape))
+                if (shape != MultiSelectionRectangle.ActualRectangle && !_vm.SelectedCanvasShapes.Contains(shape))
                 {
                     SelectOnlyAndRaiseEvent(shape);
                 }
@@ -336,59 +321,13 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private void MoveSelectedShapes(double unitsX, double unitsY)
         {
-            Canvas.SetLeft(_multiSelectionRect, Canvas.GetLeft(_multiSelectionRect) + unitsX);
-            Canvas.SetTop(_multiSelectionRect, Canvas.GetTop(_multiSelectionRect) + unitsY);
+            Canvas.SetLeft(MultiSelectionRectangle.ActualRectangle, Canvas.GetLeft(MultiSelectionRectangle.ActualRectangle) + unitsX);
+            Canvas.SetTop(MultiSelectionRectangle.ActualRectangle, Canvas.GetTop(MultiSelectionRectangle.ActualRectangle) + unitsY);
 
             foreach (Shape shape in _vm.SelectedCanvasShapes)
             {
                 Canvas.SetLeft(shape, Canvas.GetLeft(shape) + unitsX);
                 Canvas.SetTop(shape, Canvas.GetTop(shape) + unitsY);
-            }
-        }
-
-        private MultiResizeAdorner CreateMultiResizeAdorner(
-            ref Rectangle multiSelectionRect,
-            ObservableCollection<Shape> canvasShapes,
-            ObservableCollection<Shape> selectedCanvasShapes,
-            Canvas canvas,
-            Shape basedOnShape)
-        {
-            Debug.WriteLine($"CreateMultiResizeAdorner");
-
-            multiSelectionRect = new Rectangle
-            {
-                Width = basedOnShape.DesiredSize.Width,
-                Height = basedOnShape.DesiredSize.Height,
-                Fill = Brushes.Transparent
-            };
-            Canvas.SetLeft(multiSelectionRect, Canvas.GetLeft(basedOnShape));
-            Canvas.SetTop(multiSelectionRect, Canvas.GetTop(basedOnShape));
-
-            multiSelectionRect.MouseMove += Shape_MouseMove;
-            canvasShapes.Insert(0, multiSelectionRect); // important, so selection rect will be at the bottom
-
-            return new MultiResizeAdorner(multiSelectionRect, selectedCanvasShapes, canvas);
-        }
-
-        private void RemoveMultiResizeAdorner(
-            ref Rectangle multiSelectionRect,
-            AdornerLayer adornerLayer,
-            ObservableCollection<Shape> canvasShapes)
-        {
-            Debug.WriteLine($"RemoveMultiResizeAdorner");
-
-            Adorner[] adorners = adornerLayer.GetAdorners(multiSelectionRect);
-
-            foreach (Adorner adorner in adorners)
-            {
-                if (adorner is MultiResizeAdorner mra)
-                {
-                    mra.Dispose();
-                    adornerLayer.Remove(mra);
-                    canvasShapes.Remove(multiSelectionRect);
-                    multiSelectionRect = null;
-                    break;
-                }
             }
         }
     }

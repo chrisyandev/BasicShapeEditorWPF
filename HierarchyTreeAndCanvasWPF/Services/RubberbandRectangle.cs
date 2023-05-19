@@ -13,7 +13,7 @@ using System.Diagnostics;
 using HierarchyTreeAndCanvasWPF.ViewModels;
 using HierarchyTreeAndCanvasWPF.Controls;
 
-namespace HierarchyTreeAndCanvasWPF.Utilities
+namespace HierarchyTreeAndCanvasWPF.Services
 {
     public class RubberbandRectangle
     {
@@ -110,7 +110,7 @@ namespace HierarchyTreeAndCanvasWPF.Utilities
 
             Rect selectingRect = new(Canvas.GetLeft(_visualRect), Canvas.GetTop(_visualRect),
                 _visualRect.DesiredSize.Width, _visualRect.DesiredSize.Height);
-            
+
             List<Shape> shapesToAdd = new();
 
             foreach (Shape shape in _vm.CanvasShapes)
