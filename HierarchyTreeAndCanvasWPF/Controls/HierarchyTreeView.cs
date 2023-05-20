@@ -50,18 +50,6 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             _vm = DataContext as IShapeCanvasViewModel;
         }
 
-        protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
-        {
-            base.OnItemsSourceChanged(oldValue, newValue);
-
-            (ItemsSource as ObservableCollection<ShapeTreeViewItem>).CollectionChanged += HierarchyTreeView_CollectionChanged;
-        }
-
-        private void HierarchyTreeView_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            Debug.WriteLine($"TREE: New items {e.NewItems}");
-        }
-
         protected override void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
             base.OnSelectedItemChanged(e);
@@ -101,13 +89,16 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             return items;
         }
 
-        public void SelectBranch(ShapeTreeViewItem rootItem)
+        private void SelectBranch(ShapeTreeViewItem rootItem)
         {
             Debug.WriteLine($"TREE: SelectBranch() on {rootItem}");
-
-            rootItem.Select();
-            _selectedItems.Add(rootItem);
-            SelectionManager.SelectCanvasShape(rootItem, false);
+            
+            if (!_selectedItems.Contains(rootItem))
+            {
+                rootItem.Select();
+                _selectedItems.Add(rootItem);
+                SelectionManager.SelectCanvasShape(rootItem, false);
+            }
 
             foreach (ShapeTreeViewItem child in rootItem.Items)
             {
@@ -119,21 +110,13 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         {
             Debug.WriteLine($"TREE: SelectItem() on {item}");
 
-            if (!_selectedItems.Contains(item))
-            {
-                _selectedItems.Add(item);
-                item.Select();
-            }
+            SelectBranch(item);
 
             if (only)
             {
-                DeselectAllItemsExcept(item, selectionHandled: selectionHandled);
+                DeselectAllExceptBranch(item, selectionHandled: selectionHandled);
             }
-
-            if (!selectionHandled)
-            {
-                SelectionManager.SelectCanvasShape(item, only);
-            }
+            Debug.WriteLine($"TREE: _selectedItems Count {_selectedItems.Count}");
         }
 
         public void DeselectItem(ShapeTreeViewItem item, bool selectionHandled = true)
@@ -159,9 +142,9 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        private void DeselectAllItemsExcept(ShapeTreeViewItem item, bool selectionHandled = true)
+        private void DeselectAllExceptBranch(ShapeTreeViewItem item, bool selectionHandled = true)
         {
-            Debug.WriteLine($"TREE: DeselectAllItemsExcept()");
+            Debug.WriteLine($"TREE: DeselectAllExceptBranch()");
 
             for (int i = _selectedItems.Count - 1; i >= 0; i--)
             {
