@@ -131,7 +131,7 @@ namespace HierarchyTreeAndCanvasWPF.Services
 
             foreach (Shape shape in shapesToAdd)
             {
-                _canvas.SelectShape(shape, only: false);
+                _canvas.SelectShape(shape, only: false, selectionHandled: false);
             }
         }
     }

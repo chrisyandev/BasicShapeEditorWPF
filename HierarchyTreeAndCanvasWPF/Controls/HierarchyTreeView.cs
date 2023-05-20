@@ -116,6 +116,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             {
                 DeselectAllExceptBranch(item, selectionHandled: selectionHandled);
             }
+
             Debug.WriteLine($"TREE: _selectedItems Count {_selectedItems.Count}");
         }
 

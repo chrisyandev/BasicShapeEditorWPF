@@ -16,24 +16,17 @@ namespace HierarchyTreeAndCanvasWPF.Services
 {
     public static class MultiSelectionRectangle
     {
-        private static Rectangle _actualRectangle;
-
-        public static Rectangle ActualRectangle
+        static MultiSelectionRectangle()
         {
-            get
+            ActualRectangle = new Rectangle
             {
-                if (_actualRectangle == null)
-                {
-                    _actualRectangle = new Rectangle
-                    {
-                        Width = 0,
-                        Height = 0,
-                        Fill = Brushes.Transparent
-                    };
-                }
-                return _actualRectangle;
-            }
+                Width = 0,
+                Height = 0,
+                Fill = Brushes.Transparent
+            };
         }
+
+        public static Rectangle ActualRectangle { get; }
 
         public static bool IsShowing { get; set; } = false;
 
@@ -70,7 +63,6 @@ namespace HierarchyTreeAndCanvasWPF.Services
             Canvas.SetLeft(ActualRectangle, Canvas.GetLeft(basedOnShape));
             Canvas.SetTop(ActualRectangle, Canvas.GetTop(basedOnShape));
 
-            //multiSelectionRect.MouseMove += Shape_MouseMove;
             canvasShapes.Insert(0, ActualRectangle); // important, so selection rect will be at the bottom
 
             return new MultiResizeAdorner(ActualRectangle, selectedCanvasShapes, canvas);
@@ -93,7 +85,6 @@ namespace HierarchyTreeAndCanvasWPF.Services
                         mra.Dispose();
                         adornerLayer.Remove(mra);
                         canvasShapes.Remove(ActualRectangle);
-                        _actualRectangle = null;
                         break;
                     }
                 }
