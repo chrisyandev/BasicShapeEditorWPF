@@ -87,37 +87,43 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
             _adornerVisuals.Add(_bottomRightThumb);
         }
 
-        private void AdjustMultiSelectionRect(Rectangle multiSelectionRect, Shape addedShape)
+        private void AdjustMultiSelectionRect(Rectangle multiSelectionRect, IEnumerable<Shape> selectedShapes)
         {
-            double shapeWidth = addedShape.DesiredSize.Width; // use DesiredSize or ActualWidth for Polygon
-            double shapeHeight = addedShape.DesiredSize.Height;
-            double shapeLeft = Canvas.GetLeft(addedShape);
-            double shapeTop = Canvas.GetTop(addedShape);
-            double shapeRight = shapeLeft + shapeWidth;
-            double shapeBottom = shapeTop + shapeHeight;
+            double startingPointX = selectedShapes.Min(s => Canvas.GetLeft(s));
+            double startingPointY = selectedShapes.Min(s => Canvas.GetTop(s));
 
-            Rect currentBounds = new Rect(
-                Canvas.GetLeft(multiSelectionRect), Canvas.GetTop(multiSelectionRect),
-                multiSelectionRect.Width, multiSelectionRect.Height);
+            Rect currentBounds = new Rect(startingPointX, startingPointY, 0, 0);
             Rect newBounds = currentBounds;
 
-            if (shapeLeft < currentBounds.Left)
+            foreach (Shape shape in selectedShapes)
             {
-                newBounds.X = shapeLeft;
-                newBounds.Width += currentBounds.Left - shapeLeft;
-            }
-            if (shapeTop < currentBounds.Top)
-            {
-                newBounds.Y = shapeTop;
-                newBounds.Height += currentBounds.Top - shapeTop;
-            }
-            if (shapeRight > currentBounds.Right)
-            {
-                newBounds.Width += shapeRight - currentBounds.Right;
-            }
-            if (shapeBottom > currentBounds.Bottom)
-            {
-                newBounds.Height += shapeBottom - currentBounds.Bottom;
+                double shapeWidth = shape.DesiredSize.Width; // use DesiredSize or ActualWidth for Polygon
+                double shapeHeight = shape.DesiredSize.Height;
+                double shapeLeft = Canvas.GetLeft(shape);
+                double shapeTop = Canvas.GetTop(shape);
+                double shapeRight = shapeLeft + shapeWidth;
+                double shapeBottom = shapeTop + shapeHeight;
+
+                if (shapeLeft < currentBounds.Left)
+                {
+                    newBounds.X = shapeLeft;
+                    newBounds.Width += currentBounds.Left - shapeLeft;
+                }
+                if (shapeTop < currentBounds.Top)
+                {
+                    newBounds.Y = shapeTop;
+                    newBounds.Height += currentBounds.Top - shapeTop;
+                }
+                if (shapeRight > currentBounds.Right)
+                {
+                    newBounds.Width += shapeRight - currentBounds.Right;
+                }
+                if (shapeBottom > currentBounds.Bottom)
+                {
+                    newBounds.Height += shapeBottom - currentBounds.Bottom;
+                }
+
+                currentBounds = newBounds;
             }
 
             Canvas.SetLeft(multiSelectionRect, newBounds.Left);
@@ -149,9 +155,9 @@ namespace HierarchyTreeAndCanvasWPF.Adorners
 
         private void SelectedShapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (_selectedShapes.Count > 0)
             {
-                AdjustMultiSelectionRect(_multiSelectionRect, (Shape)e.NewItems[0]);
+                AdjustMultiSelectionRect(_multiSelectionRect, _selectedShapes);
                 CalculateMultiSelectionRectMinSize(_multiSelectionRect, _selectedShapes);
             }
         }

@@ -60,6 +60,8 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public void SelectShape(Shape shape, bool only = true, bool selectionHandled = true)
         {
+            Debug.WriteLine($"CANVAS: SelectShape() on {shape}");
+
             if (!MultiSelectionRectangle.IsShowing)
             {
                 MultiSelectionRectangle.Show(this, _vm, shape);
@@ -92,6 +94,8 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public void DeselectShape(Shape shape, bool selectionHandled = true)
         {
+            Debug.WriteLine($"CANVAS: DeselectShape() on {shape}");
+
             _vm.SelectedCanvasShapes.Remove(shape);
 
             if (_vm.SelectedCanvasShapes.Count == 0)
