@@ -22,7 +22,8 @@
         <controls:HierarchyTreeView x:Name="hierarchyTreeView"
                                     Grid.Column="0"
                                     ItemsSource="{Binding TreeItems}"
-                                    Background="LightYellow"/>
+                                    Background="LightYellow"
+                                    SelectionManager="{Binding SelectionManager, Converter={StaticResource DebuggerConverter}}"/>
 
         <ItemsControl Grid.Column="1"
                       ItemsSource="{Binding CanvasShapes}">
@@ -30,7 +31,8 @@
                 <ItemsPanelTemplate>
                     <controls:ShapeCanvas x:Name="shapeCanvas"
                                           Background="Orange"
-                                          AllowDrop="True"/>
+                                          AllowDrop="True"
+                                          SelectionManager="{Binding SelectionManager, Converter={StaticResource DebuggerConverter}}"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>

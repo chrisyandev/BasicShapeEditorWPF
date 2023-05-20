@@ -14,20 +14,33 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using HierarchyTreeAndCanvasWPF.Services;
+using System.Runtime.CompilerServices;
 
 namespace HierarchyTreeAndCanvasWPF.Controls
 {
     public class HierarchyTreeView : TreeView
     {
+        public static readonly DependencyProperty SelectionManagerProperty =
+            DependencyProperty.Register(
+                "SelectionManager",
+                typeof(SelectionManager),
+                typeof(HierarchyTreeView),
+                new PropertyMetadata(OnSelectionManagerPropertyChanged)
+            );
+
+        private static void OnSelectionManagerPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            SelectionManager selectionManager = (SelectionManager)e.NewValue;
+            selectionManager.HierarchyTreeView = (HierarchyTreeView)d;
+        }
+
         private IShapeCanvasViewModel _vm;
         private List<ShapeTreeViewItem> _selectedItems = new();
 
-        public HierarchyTreeView()
+        public SelectionManager SelectionManager
         {
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.SelectOnly, (shape, item) => SelectOnly(item));
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.SelectAdditional, (shape, item) => SelectAdditional(item));
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.Deselect, (shape, item) => DeselectItem(item));
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.Remove, (shape, item) => RemoveItem(item));
+            get { return (SelectionManager)GetValue(SelectionManagerProperty); }
+            set { SetValue(SelectionManagerProperty, value); }
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -75,14 +88,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
                 foreach (ShapeTreeViewItem item in itemsToSelect)
                 {
-                    if (shiftOrCtrlPressed)
-                    {
-                        SelectAdditionalAndRaiseEvent(item);
-                    }
-                    else
-                    {
-                        SelectOnlyAndRaiseEvent(item);
-                    }
+                    SelectItem(item, only: !shiftOrCtrlPressed, selectionHandled: false);
                 }
 
                 Debug.WriteLine($"TREE: Selected items count {_selectedItems.Count}");
@@ -91,6 +97,8 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         private IEnumerable<ShapeTreeViewItem> GetBranch(ShapeTreeViewItem rootItem)
         {
+            Debug.WriteLine($"TREE: GetBranch()");
+
             yield return rootItem;
 
             foreach (ShapeTreeViewItem child in rootItem.Items)
@@ -102,84 +110,72 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             }
         }
 
-        private void SelectOnly(ShapeTreeViewItem item)
+        public void SelectItem(ShapeTreeViewItem item, bool only = true, bool selectionHandled = true)
         {
-            DeselectAllItemsExcept(item);
+            Debug.WriteLine($"TREE: SelectItem()");
 
             if (!_selectedItems.Contains(item))
             {
                 _selectedItems.Add(item);
                 item.Select();
             }
-        }
 
-        private void SelectAdditional(ShapeTreeViewItem item)
-        {
-            if (!_selectedItems.Contains(item))
+            if (only)
             {
-                _selectedItems.Add(item);
-                item.Select();
+                DeselectAllItemsExcept(item, selectionHandled: selectionHandled);
+            }
+
+            if (!selectionHandled)
+            {
+                SelectionManager.SelectCanvasShape(item, only);
             }
         }
 
-        private void SelectOnlyAndRaiseEvent(ShapeTreeViewItem item)
+        public void DeselectItem(ShapeTreeViewItem item, bool selectionHandled = true)
         {
-            SelectOnly(item);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.SelectOnly, item.Id);
-        }
+            Debug.WriteLine($"TREE: DeselectItem()");
 
-        private void SelectAdditionalAndRaiseEvent(ShapeTreeViewItem item)
-        {
-            SelectAdditional(item);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.SelectAdditional, item.Id);
-        }
-
-        private void DeselectAllItems()
-        {
-            Debug.WriteLine($"TREE: Deselecting all items");
-
-            for (int i = _selectedItems.Count - 1; i >= 0; i--)
-            {
-                DeselectItemAndRaiseEvent(_selectedItems[i]);
-            }
-        }
-
-        private void DeselectAllItemsExcept(ShapeTreeViewItem item)
-        {
-            IEnumerable<ShapeTreeViewItem> doNotDeselect = GetBranch(item);
-
-            for (int i = _selectedItems.Count - 1; i >= 0; i--)
-            {
-                if (!doNotDeselect.Contains(_selectedItems[i]))
-                {
-                    DeselectItemAndRaiseEvent(_selectedItems[i]);
-                }
-            }
-        }
-
-        private void DeselectItem(ShapeTreeViewItem item)
-        {
-            _selectedItems.Remove(item);
             item.Deselect();
+            _selectedItems.Remove(item);
 
-            Debug.WriteLine($"TREE: Deselected {item.Header}");
+            if (!selectionHandled)
+            {
+                SelectionManager.DeselectCanvasShape(item);
+            }
         }
 
-        private void DeselectItemAndRaiseEvent(ShapeTreeViewItem item)
+        private void DeselectAllItems(bool selectionHandled = true)
         {
-            DeselectItem(item);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.Deselect, item.Id);
+            Debug.WriteLine($"TREE: DeselectAllItems()");
+
+            for (int i = _selectedItems.Count - 1; i >= 0; i--)
+            {
+                DeselectItem(_selectedItems[i], selectionHandled: selectionHandled);
+            }
         }
 
-        private void RemoveItem(ShapeTreeViewItem item)
+        private void DeselectAllItemsExcept(ShapeTreeViewItem item, bool selectionHandled = true)
+        {
+            Debug.WriteLine($"TREE: DeselectAllItemsExcept()");
+
+            for (int i = _selectedItems.Count - 1; i >= 0; i--)
+            {
+                if (_selectedItems[i] == item || _selectedItems[i].IsDescendantOf(item))
+                {
+                    continue;
+                }
+                DeselectItem(_selectedItems[i], selectionHandled: selectionHandled);
+            }
+        }
+
+        public void RemoveItem(ShapeTreeViewItem item, bool selectionHandled = true)
         {
             _vm.TreeItems.Remove(item);
-        }
 
-        private void RemoveItemAndRaiseEvent(ShapeTreeViewItem item)
-        {
-            RemoveItem(item);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.Remove, item.Id);
+            if (!selectionHandled)
+            {
+                SelectionManager.RemoveCanvasShape(item);
+            }
         }
     }
 }

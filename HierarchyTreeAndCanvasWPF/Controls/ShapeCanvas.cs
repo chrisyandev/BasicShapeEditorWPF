@@ -22,8 +22,28 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 {
     public class ShapeCanvas : Canvas
     {
+        public static readonly DependencyProperty SelectionManagerProperty =
+            DependencyProperty.Register(
+                "SelectionManager",
+                typeof(SelectionManager),
+                typeof(ShapeCanvas),
+                new PropertyMetadata(OnSelectionManagerPropertyChanged)
+            );
+
+        private static void OnSelectionManagerPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            SelectionManager selectionManager = (SelectionManager)e.NewValue;
+            selectionManager.ShapeCanvas = (ShapeCanvas)d;
+        }
+
         private IShapeCanvasViewModel _vm;
-        RubberbandRectangle _rubberbandRect;
+        private RubberbandRectangle _rubberbandRect;
+
+        public SelectionManager SelectionManager
+        {
+            get { return (SelectionManager)GetValue(SelectionManagerProperty); }
+            set { SetValue(SelectionManagerProperty, value); }
+        }
 
         public ShapeCanvas()
         {
@@ -35,112 +55,11 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             MouseMove += Canvas_MouseMove;
             DragOver += Canvas_DragOver;
 
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.SelectOnly, (shape, item) => SelectOnly(shape));
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.SelectAdditional, (shape, item) => SelectAdditional(shape));
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.Deselect, (shape, item) => DeselectShape(shape));
-            ShapeEventMessenger.Subscribe(ShapeEventMessenger.Remove, (shape, item) => RemoveShape(shape));
-
             MultiSelectionRectangle.ActualRectangle.MouseMove += Shape_MouseMove;
         }
 
-        private void SelectOnly(Shape shape)
+        public void SelectShape(Shape shape, bool only = true, bool selectionHandled = true)
         {
-            DeselectAllShapesExcept(shape);
-            AddShapeToSelection(shape);
-        }
-
-        private void SelectAdditional(Shape shape)
-        {
-            AddShapeToSelection(shape);
-        }
-
-        private void SelectOnlyAndRaiseEvent(Shape shape)
-        {
-            SelectOnly(shape);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.SelectOnly, shape.GetId());
-        }
-
-        public void SelectAdditionalAndRaiseEvent(Shape shape)
-        {
-            SelectAdditional(shape);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.SelectAdditional, shape.GetId());
-        }
-
-        public void SelectAllShapes()
-        {
-            for (int i = 0; i < _vm.CanvasShapes.Count; i++)
-            {
-                SelectAdditionalAndRaiseEvent(_vm.CanvasShapes[i]);
-            }
-        }
-
-        private void DeselectAllShapes()
-        {
-            Debug.WriteLine($"Canvas: DeselectAllShapes");
-
-            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
-            {
-                DeselectShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
-            }
-        }
-
-        private void DeselectAllShapesExcept(Shape shape)
-        {
-            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
-            {
-                if (_vm.SelectedCanvasShapes[i] != shape)
-                {
-                    DeselectShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
-                }
-            }
-        }
-
-        private void DeselectShape(Shape shape)
-        {
-            Debug.WriteLine($"Canvas: deselecting {shape}");
-
-            _vm.SelectedCanvasShapes.Remove(shape);
-
-            if (_vm.SelectedCanvasShapes.Count == 0)
-            {
-                MultiSelectionRectangle.Hide(this, _vm);
-
-                Debug.WriteLine($"Canvas: deselected all shapes");
-            }
-        }
-
-        private void DeselectShapeAndRaiseEvent(Shape shape)
-        {
-            DeselectShape(shape);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.Deselect, shape.GetId());
-        }
-
-        public void RemoveSelectedShapes()
-        {
-            Debug.WriteLine($"Canvas: RemoveSelectedShapes");
-
-            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
-            {
-                RemoveShapeAndRaiseEvent(_vm.SelectedCanvasShapes[i]);
-            }
-        }
-
-        private void RemoveShape(Shape shape)
-        {
-            DeselectShape(shape);
-            _vm.CanvasShapes.Remove(shape);
-        }
-
-        private void RemoveShapeAndRaiseEvent(Shape shape)
-        {
-            RemoveShape(shape);
-            ShapeEventMessenger.Publish(ShapeEventMessenger.Remove, shape.GetId());
-        }
-
-        private void AddShapeToSelection(Shape shape)
-        {
-            Debug.WriteLine($"AddShapeToSelection");
-
             if (!MultiSelectionRectangle.IsShowing)
             {
                 MultiSelectionRectangle.Show(this, _vm, shape);
@@ -151,7 +70,81 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 _vm.SelectedCanvasShapes.Add(shape);
             }
 
-            Debug.WriteLine($"selected {shape}");
+            if (only)
+            {
+                DeselectAllShapesExcept(shape, selectionHandled: selectionHandled);
+            }
+
+            if (!selectionHandled)
+            {
+                SelectionManager.SelectTreeViewItem(shape, only);
+            }
+        }
+
+        public void SelectAllShapes(bool selectionHandled = true)
+        {
+            for (int i = 0; i < _vm.CanvasShapes.Count; i++)
+            {
+                Shape targetShape = _vm.CanvasShapes[i];
+                SelectShape(targetShape, only: false, selectionHandled: selectionHandled);
+            }
+        }
+
+        public void DeselectShape(Shape shape, bool selectionHandled = true)
+        {
+            _vm.SelectedCanvasShapes.Remove(shape);
+
+            if (_vm.SelectedCanvasShapes.Count == 0)
+            {
+                MultiSelectionRectangle.Hide(this, _vm);
+            }
+
+            if (!selectionHandled)
+            {
+                SelectionManager.DeselectTreeViewItem(shape);
+            }
+        }
+
+        public void DeselectAllShapes(bool selectionHandled = true)
+        {
+            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
+            {
+                Shape targetShape = _vm.SelectedCanvasShapes[i];
+                DeselectShape(targetShape, selectionHandled: selectionHandled);
+            }
+        }
+
+        public void DeselectAllShapesExcept(Shape shape, bool selectionHandled = true)
+        {
+            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
+            {
+                Shape targetShape = _vm.SelectedCanvasShapes[i];
+
+                if (targetShape != shape)
+                {
+                    DeselectShape(targetShape, selectionHandled: selectionHandled);
+                }
+            }
+        }
+
+        public void RemoveShape(Shape shape, bool selectionHandled = true)
+        {
+            DeselectShape(shape, selectionHandled: selectionHandled);
+            _vm.CanvasShapes.Remove(shape);
+
+            if (!selectionHandled)
+            {
+                SelectionManager.RemoveTreeViewItem(shape);
+            }
+        }
+
+        public void RemoveSelectedShapes(bool selectionHandled = true)
+        {
+            for (int i = _vm.SelectedCanvasShapes.Count - 1; i >= 0; i--)
+            {
+                Shape targetShape = _vm.SelectedCanvasShapes[i];
+                RemoveShape(targetShape, selectionHandled: selectionHandled);
+            }
         }
 
         private void Canvas_Initialized(object sender, EventArgs e)
@@ -170,13 +163,13 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             if (_rubberbandRect != null)
             {
                 Mouse.Capture(null);
-                DeselectAllShapes();
+                DeselectAllShapes(selectionHandled: false);
                 _rubberbandRect.DragStop();
                 _rubberbandRect = null;
             }
             else if (e.Source is Canvas)
             {
-                DeselectAllShapes();
+                DeselectAllShapes(selectionHandled: false);
             }
         }
 
@@ -280,11 +273,11 @@ namespace HierarchyTreeAndCanvasWPF.Controls
             if (Keyboard.Modifiers == ModifierKeys.Control
                 || Keyboard.Modifiers == ModifierKeys.Shift)
             {
-                SelectAdditionalAndRaiseEvent(shape);
+                SelectShape(shape, only: false, selectionHandled: false);
             }
             else
             {
-                SelectOnlyAndRaiseEvent(shape);
+                SelectShape(shape, only: true, selectionHandled: false);
             }
         }
 
@@ -305,7 +298,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
                 // if this shape was not selected before dragging, only drag this shape
                 if (shape != MultiSelectionRectangle.ActualRectangle && !_vm.SelectedCanvasShapes.Contains(shape))
                 {
-                    SelectOnlyAndRaiseEvent(shape);
+                    SelectShape(shape, only: true, selectionHandled: false);
                 }
 
                 Point cursorStartPoint = Mouse.GetPosition(this);

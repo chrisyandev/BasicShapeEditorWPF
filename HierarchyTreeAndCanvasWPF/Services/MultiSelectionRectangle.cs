@@ -39,6 +39,8 @@ namespace HierarchyTreeAndCanvasWPF.Services
 
         public static void Show(Canvas canvas, IShapeCanvasViewModel _vm, Shape basedOnShape)
         {
+            Debug.WriteLine("MultiSelectionRectangle: Show()");
+
             IsShowing = true;
 
             AdornerLayer.GetAdornerLayer(canvas).Add(CreateMultiResizeAdorner(
@@ -47,6 +49,8 @@ namespace HierarchyTreeAndCanvasWPF.Services
 
         public static void Hide(Canvas canvas, IShapeCanvasViewModel _vm)
         {
+            Debug.WriteLine("MultiSelectionRectangle: Hide()");
+
             IsShowing = false;
 
             RemoveMultiResizeAdorner(AdornerLayer.GetAdornerLayer(canvas), _vm.CanvasShapes);

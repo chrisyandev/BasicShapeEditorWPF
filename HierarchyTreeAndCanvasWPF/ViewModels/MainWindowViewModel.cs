@@ -23,6 +23,7 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
     public class MainWindowViewModel : INotifyPropertyChanged, IShapeCanvasViewModel
     {
         private string _activeTool;
+        private SelectionManager _selectionManager;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -40,6 +41,9 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
             // hardcoded for now
             ShapeMinWidth = 0;
             ShapeMinHeight = 0;
+
+            SelectionManager = new SelectionManager();
+            SelectionManager.VM = this;
         }
 
         public ObservableCollection<ShapeTreeViewItem> TreeItems { get; set; }
@@ -47,6 +51,22 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
         public ObservableCollection<Shape> CanvasShapes { get; set; }
 
         public ObservableCollection<Shape> SelectedCanvasShapes { get; set; }
+
+        public SelectionManager SelectionManager
+        {
+            get
+            {
+                return _selectionManager;
+            }
+            set
+            {
+                if (value == _selectionManager) return;
+                _selectionManager = value;
+                OnPropertyChanged();
+
+                Debug.WriteLine(_selectionManager);
+            }
+        }
 
         public string ActiveTool
         {
@@ -102,10 +122,10 @@ namespace HierarchyTreeAndCanvasWPF.ViewModels
                 Canvas.SetTop(newShape, mousePosY);
                 CanvasShapes.Add(newShape);
 
-                ShapeTreeViewItem newItem = new ShapeTreeViewItem(shapeName);
-                TreeItems.Add(newItem);
+                ShapeTreeViewItem shapeTreeViewItem = new ShapeTreeViewItem(shapeName);
+                TreeItems.Add(shapeTreeViewItem);
 
-                ShapeManager.Register(newShape, newItem);
+                SelectionManager.Register(newShape, shapeTreeViewItem);
             }
 
             return newShape;

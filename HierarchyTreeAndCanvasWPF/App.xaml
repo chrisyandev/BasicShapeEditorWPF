@@ -16,5 +16,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <converters:DebuggerConverter x:Key="DebuggerConverter" />
     </Application.Resources>
 </Application>

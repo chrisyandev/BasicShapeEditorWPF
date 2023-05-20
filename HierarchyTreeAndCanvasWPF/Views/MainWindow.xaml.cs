@@ -36,11 +36,11 @@ namespace HierarchyTreeAndCanvasWPF.Views
         {
             if (e.Key == Key.Delete)
             {
-                _shapeCanvas.RemoveSelectedShapes();
+                _shapeCanvas.RemoveSelectedShapes(selectionHandled: false);
             }
             else if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                _shapeCanvas.SelectAllShapes();
+                _shapeCanvas.SelectAllShapes(selectionHandled: false);
             }
         }
     }
