@@ -1,1 +1,1 @@
-# Hierarchy Tree and Canvas WPF
+# Basic Shape Editor WPF
