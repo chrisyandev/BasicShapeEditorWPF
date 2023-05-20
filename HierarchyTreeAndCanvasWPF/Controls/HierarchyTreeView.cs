@@ -66,53 +66,58 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         {
             base.OnSelectedItemChanged(e);
 
-            Debug.WriteLine($"TREE: OnSelectedItemChanged Old> {e.OldValue} New> {e.NewValue}");
-
             if (e.NewValue is ShapeTreeViewItem newItem)
             {
                 // prevent default behavior
                 newItem.IsSelected = false;
 
-                // TODO: remove
-                IEnumerable<ShapeTreeViewItem> itemsToSelect = GetBranch(newItem);
-                Debug.WriteLine($"itemsToSelect >>> \n");
-                foreach (ShapeTreeViewItem i in itemsToSelect)
-                {
-                    Debug.WriteLine(i.Header);
-                }
-                Debug.WriteLine("");
-                // ============
-
                 bool shiftOrCtrlPressed = Keyboard.Modifiers == ModifierKeys.Control
-                        || Keyboard.Modifiers == ModifierKeys.Shift;
+                    || Keyboard.Modifiers == ModifierKeys.Shift;
 
-                foreach (ShapeTreeViewItem item in itemsToSelect)
+                if (shiftOrCtrlPressed)
                 {
-                    SelectItem(item, only: !shiftOrCtrlPressed, selectionHandled: false);
+                    SelectBranch(newItem);
                 }
-
-                Debug.WriteLine($"TREE: Selected items count {_selectedItems.Count}");
+                else
+                {
+                    DeselectAllItems(selectionHandled: false);
+                    SelectBranch(newItem);
+                }
             }
         }
 
-        private IEnumerable<ShapeTreeViewItem> GetBranch(ShapeTreeViewItem rootItem)
+        private List<ShapeTreeViewItem> GetBranchItems(ShapeTreeViewItem rootItem)
         {
-            Debug.WriteLine($"TREE: GetBranch()");
-
-            yield return rootItem;
+            List<ShapeTreeViewItem> items = new() { rootItem };
 
             foreach (ShapeTreeViewItem child in rootItem.Items)
             {
-                foreach (ShapeTreeViewItem nestedItem in GetBranch(child))
+                foreach (ShapeTreeViewItem nestedItem in GetBranchItems(child))
                 {
-                    yield return nestedItem;
+                    items.Add(nestedItem);
                 }
+            }
+
+            return items;
+        }
+
+        public void SelectBranch(ShapeTreeViewItem rootItem)
+        {
+            Debug.WriteLine($"TREE: SelectBranch() on {rootItem}");
+
+            rootItem.Select();
+            _selectedItems.Add(rootItem);
+            SelectionManager.SelectCanvasShape(rootItem, false);
+
+            foreach (ShapeTreeViewItem child in rootItem.Items)
+            {
+                SelectBranch(child);
             }
         }
 
         public void SelectItem(ShapeTreeViewItem item, bool only = true, bool selectionHandled = true)
         {
-            Debug.WriteLine($"TREE: SelectItem()");
+            Debug.WriteLine($"TREE: SelectItem() on {item}");
 
             if (!_selectedItems.Contains(item))
             {
@@ -133,7 +138,7 @@ namespace HierarchyTreeAndCanvasWPF.Controls
 
         public void DeselectItem(ShapeTreeViewItem item, bool selectionHandled = true)
         {
-            Debug.WriteLine($"TREE: DeselectItem()");
+            Debug.WriteLine($"TREE: DeselectItem() on {item}");
 
             item.Deselect();
             _selectedItems.Remove(item);

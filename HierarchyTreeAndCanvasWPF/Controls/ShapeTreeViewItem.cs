@@ -60,27 +60,11 @@ namespace HierarchyTreeAndCanvasWPF.Controls
         public void Select()
         {
             MSelected = true;
-
-/*            if (Items.Count > 0)
-            {
-                foreach (ShapeTreeViewItem item in Items)
-                {
-                    item.Select();
-                }
-            }*/
         }
 
         public void Deselect()
         {
             MSelected = false;
-
-/*            if (Items.Count > 0)
-            {
-                foreach (ShapeTreeViewItem item in Items)
-                {
-                    item.Deselect();
-                }
-            }*/
         }
 
         public void Highlight()
