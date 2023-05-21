@@ -75,7 +75,14 @@ namespace BasicShapeEditorWPF.Controls
 
         public void RemoveItem(ShapeTreeViewItem item, bool selectionHandled = true)
         {
-            _vm.TreeItems.Remove(item);
+            if (item.Parent is ShapeTreeViewItem parentItem)
+            {
+                parentItem.Items.Remove(item);
+            }
+            else if (UIHelper.FindTreeView(item) is TreeView treeView)
+            {
+                (treeView.ItemsSource as ObservableCollection<ShapeTreeViewItem>).Remove(item);
+            }
 
             if (!selectionHandled)
             {
