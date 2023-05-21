@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using BasicShapeEditorWPF.Services;
 using System.Runtime.CompilerServices;
+using BasicShapeEditorWPF.Utilities;
 
 namespace BasicShapeEditorWPF.Controls
 {
@@ -34,6 +35,8 @@ namespace BasicShapeEditorWPF.Controls
             selectionManager.HierarchyTreeView = (HierarchyTreeView)d;
         }
 
+        private static TextBlock _previouslyHoveredOver;
+
         private IShapeCanvasViewModel _vm;
         private List<ShapeTreeViewItem> _selectedItems = new();
 
@@ -41,6 +44,43 @@ namespace BasicShapeEditorWPF.Controls
         {
             get { return (SelectionManager)GetValue(SelectionManagerProperty); }
             set { SetValue(SelectionManagerProperty, value); }
+        }
+
+        public void SelectItem(ShapeTreeViewItem item, bool only = true, bool selectionHandled = true)
+        {
+            Debug.WriteLine($"TREE: SelectItem() on {item}");
+
+            SelectBranch(item);
+
+            if (only)
+            {
+                DeselectAllExceptBranch(item, selectionHandled: selectionHandled);
+            }
+
+            Debug.WriteLine($"TREE: _selectedItems Count {_selectedItems.Count}");
+        }
+
+        public void DeselectItem(ShapeTreeViewItem item, bool selectionHandled = true)
+        {
+            Debug.WriteLine($"TREE: DeselectItem() on {item}");
+
+            item.Deselect();
+            _selectedItems.Remove(item);
+
+            if (!selectionHandled)
+            {
+                SelectionManager.DeselectCanvasShape(item);
+            }
+        }
+
+        public void RemoveItem(ShapeTreeViewItem item, bool selectionHandled = true)
+        {
+            _vm.TreeItems.Remove(item);
+
+            if (!selectionHandled)
+            {
+                SelectionManager.RemoveCanvasShape(item);
+            }
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -70,6 +110,55 @@ namespace BasicShapeEditorWPF.Controls
                 {
                     DeselectAllItems(selectionHandled: false);
                     SelectBranch(newItem);
+                }
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (e.OriginalSource is TextBlock currentlyHoveringOver)
+            {
+                if (currentlyHoveringOver != _previouslyHoveredOver)
+                {
+                    RemoveHoverBackground(_previouslyHoveredOver);
+                    SetHoverBackground(currentlyHoveringOver);
+                    _previouslyHoveredOver = currentlyHoveringOver;
+                }
+            }
+            else if (_previouslyHoveredOver != null)
+            {
+                RemoveHoverBackground(_previouslyHoveredOver);
+                _previouslyHoveredOver = null;
+            }
+        }
+
+        private void SetHoverBackground(TextBlock textBlock)
+        {
+            if (textBlock != null)
+            {
+                ShapeTreeViewItem targetItem = UIHelper.FindVisualParent<ShapeTreeViewItem>(textBlock);
+
+                // If item is selected, let it keep its own styling
+                if (!targetItem.MSelected)
+                {
+                    Brush HoverBrush = (Brush)new BrushConverter().ConvertFrom("#505050");
+                    textBlock.Background = HoverBrush;
+                }
+            }
+        }
+
+        private void RemoveHoverBackground(TextBlock textBlock)
+        {
+            if (textBlock != null)
+            {
+                ShapeTreeViewItem targetItem = UIHelper.FindVisualParent<ShapeTreeViewItem>(textBlock);
+
+                // If item is selected, let it keep its own styling
+                if (!targetItem.MSelected)
+                {
+                    textBlock.Background = Brushes.Transparent;
                 }
             }
         }
@@ -106,33 +195,6 @@ namespace BasicShapeEditorWPF.Controls
             }
         }
 
-        public void SelectItem(ShapeTreeViewItem item, bool only = true, bool selectionHandled = true)
-        {
-            Debug.WriteLine($"TREE: SelectItem() on {item}");
-
-            SelectBranch(item);
-
-            if (only)
-            {
-                DeselectAllExceptBranch(item, selectionHandled: selectionHandled);
-            }
-
-            Debug.WriteLine($"TREE: _selectedItems Count {_selectedItems.Count}");
-        }
-
-        public void DeselectItem(ShapeTreeViewItem item, bool selectionHandled = true)
-        {
-            Debug.WriteLine($"TREE: DeselectItem() on {item}");
-
-            item.Deselect();
-            _selectedItems.Remove(item);
-
-            if (!selectionHandled)
-            {
-                SelectionManager.DeselectCanvasShape(item);
-            }
-        }
-
         private void DeselectAllItems(bool selectionHandled = true)
         {
             Debug.WriteLine($"TREE: DeselectAllItems()");
@@ -154,16 +216,6 @@ namespace BasicShapeEditorWPF.Controls
                     continue;
                 }
                 DeselectItem(_selectedItems[i], selectionHandled: selectionHandled);
-            }
-        }
-
-        public void RemoveItem(ShapeTreeViewItem item, bool selectionHandled = true)
-        {
-            _vm.TreeItems.Remove(item);
-
-            if (!selectionHandled)
-            {
-                SelectionManager.RemoveCanvasShape(item);
             }
         }
     }

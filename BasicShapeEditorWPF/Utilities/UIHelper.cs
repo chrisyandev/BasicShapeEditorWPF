@@ -79,5 +79,42 @@ namespace BasicShapeEditorWPF.Utilities
 
             return parent as TreeView;
         }
+
+        /// <summary>
+        /// Finds the first parent of type 'T'
+        /// </summary>
+        public static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+            if (parentObject == null)
+                return null;
+
+            if (parentObject is T parent)
+                return parent;
+            else
+                return FindVisualParent<T>(parentObject);
+        }
+
+        /// <summary>
+        /// Finds the first child of type 'T'
+        /// </summary>
+        public static T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null)
+                return null;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result)
+                    return result;
+
+                var descendant = FindVisualChild<T>(child);
+                if (descendant != null)
+                    return descendant;
+            }
+
+            return null;
+        }
     }
 }

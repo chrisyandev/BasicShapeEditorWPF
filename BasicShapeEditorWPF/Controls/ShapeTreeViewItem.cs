@@ -29,6 +29,8 @@ namespace BasicShapeEditorWPF.Controls
             Header = header;
             _mSelected = false;
             AllowDrop = true;
+            Background = Brushes.Transparent;
+            Foreground = Brushes.White;
         }
 
         public string Id { get; set; }
@@ -70,34 +72,14 @@ namespace BasicShapeEditorWPF.Controls
 
         public void Highlight()
         {
-            Background = SelectedBrush;
-            Foreground = Brushes.White;
+            TextBlock targetTextBlock = UIHelper.FindVisualChild<TextBlock>(this);
+            targetTextBlock.Background = SelectedBrush;
         }
 
         public void RemoveHighlight()
         {
-            Background = Brushes.Transparent;
-            Foreground = Brushes.White;
-        }
-
-        protected override void OnMouseEnter(MouseEventArgs e)
-        {
-            base.OnMouseEnter(e);
-
-            if (!MSelected)
-            {
-                Background = HoverBrush;
-            }
-        }
-
-        protected override void OnMouseLeave(MouseEventArgs e)
-        {
-            base.OnMouseLeave(e);
-
-            if (!MSelected)
-            {
-                Background = Brushes.Transparent;
-            }
+            TextBlock targetTextBlock = UIHelper.FindVisualChild<TextBlock>(this);
+            targetTextBlock.Background = Brushes.Transparent;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -130,7 +112,7 @@ namespace BasicShapeEditorWPF.Controls
 
             ShapeTreeViewItem targetItem = e.Source as ShapeTreeViewItem;
 
-            if (targetItem != null)
+            if (targetItem != null && !targetItem.MSelected)
             {
                 targetItem.RemoveHighlight();
             }
@@ -143,7 +125,10 @@ namespace BasicShapeEditorWPF.Controls
             ShapeTreeViewItem droppedItem = e.Data.GetData(typeof(ShapeTreeViewItem)) as ShapeTreeViewItem;
             ShapeTreeViewItem receivingItem = e.Source as ShapeTreeViewItem;
 
-            receivingItem.RemoveHighlight();
+            if (!receivingItem.MSelected)
+            {
+                receivingItem.RemoveHighlight();
+            }
 
             if (droppedItem == receivingItem || droppedItem.Parent == receivingItem || receivingItem.IsDescendantOf(droppedItem))
             {
