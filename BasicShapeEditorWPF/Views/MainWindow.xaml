@@ -22,15 +22,21 @@
         <controls:HierarchyTreeView x:Name="hierarchyTreeView"
                                     Grid.Column="0"
                                     ItemsSource="{Binding TreeItems}"
-                                    Background="LightYellow"
-                                    SelectionManager="{Binding SelectionManager, Converter={StaticResource DebuggerConverter}}"/>
+                                    Background="#383838"
+                                    SelectionManager="{Binding SelectionManager, Converter={StaticResource DebuggerConverter}}">
+            <controls:HierarchyTreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="Foreground" Value="White"/>
+                </Style>
+            </controls:HierarchyTreeView.ItemContainerStyle>
+        </controls:HierarchyTreeView>
 
         <ItemsControl Grid.Column="1"
                       ItemsSource="{Binding CanvasShapes}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ShapeCanvas x:Name="shapeCanvas"
-                                          Background="Orange"
+                                          Background="DarkGray"
                                           AllowDrop="True"
                                           SelectionManager="{Binding SelectionManager, Converter={StaticResource DebuggerConverter}}"/>
                 </ItemsPanelTemplate>
@@ -49,10 +55,25 @@
             </Grid.ColumnDefinitions>
             <Grid.Resources>
                 <Style x:Key="DefaultButtonStyle" TargetType="Button">
-                    <Setter Property="Background" Value="Beige"/>
-                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="Background" Value="DimGray"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Margin" Value="1,0,0,0"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <Border Name="Border" Background="{TemplateBinding Background}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="SlateGray" TargetName="Border"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
-                <SolidColorBrush x:Key="ActiveButtonBackgroundBrush" Color="Purple"/>
+                <SolidColorBrush x:Key="ActiveButtonBackgroundBrush" Color="DarkSlateBlue"/>
                 <SolidColorBrush x:Key="ActiveButtonForegroundBrush" Color="White"/>
             </Grid.Resources>
             <Button Grid.Column="0"

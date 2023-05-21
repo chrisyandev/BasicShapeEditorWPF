@@ -19,7 +19,8 @@ namespace BasicShapeEditorWPF.Controls
 {
     public class ShapeTreeViewItem : TreeViewItem
     {
-        private static readonly Brush HighlightSelectedBrush = (Brush)new BrushConverter().ConvertFrom("#0078D7");
+        private static readonly Brush SelectedBrush = (Brush)new BrushConverter().ConvertFrom("#32699A");
+        private static readonly Brush HoverBrush = (Brush)new BrushConverter().ConvertFrom("#505050");
 
         private bool _mSelected;
 
@@ -69,14 +70,34 @@ namespace BasicShapeEditorWPF.Controls
 
         public void Highlight()
         {
-            Background = Brushes.Red;
+            Background = SelectedBrush;
             Foreground = Brushes.White;
         }
 
         public void RemoveHighlight()
         {
             Background = Brushes.Transparent;
-            Foreground = Brushes.Black;
+            Foreground = Brushes.White;
+        }
+
+        protected override void OnMouseEnter(MouseEventArgs e)
+        {
+            base.OnMouseEnter(e);
+
+            if (!MSelected)
+            {
+                Background = HoverBrush;
+            }
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+
+            if (!MSelected)
+            {
+                Background = Brushes.Transparent;
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
