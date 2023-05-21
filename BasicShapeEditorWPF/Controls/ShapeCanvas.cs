@@ -62,6 +62,9 @@ namespace BasicShapeEditorWPF.Controls
         {
             Debug.WriteLine($"CANVAS: SelectShape() on {shape}");
 
+            shape.StrokeThickness = 2;
+            shape.Stroke = Brushes.LightCyan;
+
             if (!MultiSelectionRectangle.IsShowing)
             {
                 MultiSelectionRectangle.Show(this, _vm, shape);
@@ -95,6 +98,9 @@ namespace BasicShapeEditorWPF.Controls
         public void DeselectShape(Shape shape, bool selectionHandled = true)
         {
             Debug.WriteLine($"CANVAS: DeselectShape() on {shape}");
+
+            shape.StrokeThickness = 0;
+            shape.Stroke = Brushes.Transparent;
 
             _vm.SelectedCanvasShapes.Remove(shape);
 
